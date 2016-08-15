@@ -1,3 +1,7 @@
+M3BIRFinder
+==========
+A multithreaded fork of MMBIRFinder. The third "M" is for "Multithreaded"
+
 MMBIRFinder
 =========
 
