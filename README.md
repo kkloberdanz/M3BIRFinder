@@ -4,12 +4,12 @@ A multithreaded fork of MMBIRFinder. The third "M" is for "Multithreaded"
 
 ##Installation
 --------------------------------------------------------------------------
-'''bash
+```bash
 $ git clone https://github.com/kkloberdanz/M3BIRFinder
 $ cd M3BIRFinder/src
 $ python configure.py
 $ make
-'''
+```
 
 The binary can be found in ```bin```
 
