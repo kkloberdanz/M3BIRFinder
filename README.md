@@ -15,17 +15,17 @@ The binary can be found in ```bin```
 
 --------------------------------------------------------------------------
     
-To run MMBIRFinder: 
+To run M3BIRFinder: 
 Start Bash
 
 ```bash
 $bash
 ```
 
-Run MMBIRFinder with config-1.txt and designate log file location (Alignments take some time to run, maybe a long time with big reads files)
+Run M3BIRFinder with config-1.txt and designate log file location (Alignments take some time to run, maybe a long time with big reads files)
 
 ```bash
-$nohup ./MMBIRFinder config-1.txt > ./Log/run0222.log 2>&1
+$nohup ./M3BIRFinder config-1.txt > ./Log/run0222.log 2>&1
 ```
 
 Create columns.txt to be loaded into database
@@ -73,12 +73,12 @@ Create link to file
 ```bash
 $ln -s trial2/mysql_results.txt .
 
-$./MMBIRFinder config-2.txt > ./Log/run0222_1.log 2>&1
+$./M3BIRFinder config-2.txt > ./Log/run0222_1.log 2>&1
 ```
 
-Notes: These instructions are for use of the MMBIRFinder on user bosia. Some changes will have to be made to run MMBIRFinder on another user’s space.  
+Notes: These instructions are for use of the M3BIRFinder on user bosia. Some changes will have to be made to run M3BIRFinder on another user’s space.  
 
---------------------------------------------------------------------------------
+--------------------------------------------------------------------------
 
 (Old Instructions from forked project) MMBIRFinder
 =========
@@ -250,4 +250,3 @@ Version
 0.1
 
 
-    
