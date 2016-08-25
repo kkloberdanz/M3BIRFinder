@@ -2,6 +2,72 @@ M3BIRFinder
 ==========
 A multithreaded fork of MMBIRFinder. The third "M" is for "Multithreaded"
 
+--------------------------------------------------------------------------------
+To run MMBIRFinder: 
+Start Bash
+
+```bash
+$bash
+```
+
+Run MMBIRFinder with config-1.txt and designate log file location (Alignments take some time to run, maybe a long time with big reads files)
+
+```bash
+$nohup ./MMBIRFinder config-1.txt > ./Log/run0222.log 2>&1
+```
+
+Create columns.txt to be loaded into database
+
+```bash
+$./create_columns.sh
+```
+
+Load DB
+
+```bash
+$mysql -pcilnoothbec5 mmbirfinder
+```
+
+Clean after previous run
+
+```
+MariaDB[(mmbirfinder)]> delete from mmbirfinder.unaligned;
+
+MariaDB[(mmbirfinder)]> LOAD DATA LOCAL INFILE ‘columns.txt’ into table mmbirfinder.unaligned;
+
+MariaDB[(mmbirfinder)]> exit
+```
+
+Index the database
+
+```bash
+$sudo -u mysql /bin/myisamchk -o /var/lib/mysql/mmbirfinder/unaligned.MYI --key_buffer_size=2G
+
+$cd trial2
+
+$perl ../db_fixed.pl
+```
+
+If error, try:
+	MariaDB[(mmbirfinder)]> repair table mmbirfinder.unaligned
+	Then index again. 
+
+```bash
+$cd ..
+```
+
+Create link to file
+
+```bash
+$ln -s trial2/mysql_results.txt .
+
+$./MMBIRFinder config-2.txt > ./Log/run0222_1.log 2>&1
+```
+
+Notes: 
+These instructions are for use of the MMBIRFinder on user bosia. Some changes will have to be made to run MMBIRFinder on another user’s space. 
+--------------------------------------------------------------------------------
+
 MMBIRFinder
 =========
 
