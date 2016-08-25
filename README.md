@@ -2,7 +2,19 @@ M3BIRFinder
 ==========
 A multithreaded fork of MMBIRFinder. The third "M" is for "Multithreaded"
 
---------------------------------------------------------------------------------
+##Installation
+--------------------------------------------------------------------------
+'''bash
+$ git clone https://github.com/kkloberdanz/M3BIRFinder
+$ cd M3BIRFinder/src
+$ python configure.py
+$ make
+'''
+
+The binary can be found in ```bin```
+
+--------------------------------------------------------------------------
+    
 To run MMBIRFinder: 
 Start Bash
 
@@ -64,11 +76,11 @@ $ln -s trial2/mysql_results.txt .
 $./MMBIRFinder config-2.txt > ./Log/run0222_1.log 2>&1
 ```
 
-Notes: 
-These instructions are for use of the MMBIRFinder on user bosia. Some changes will have to be made to run MMBIRFinder on another user’s space. 
+Notes: These instructions are for use of the MMBIRFinder on user bosia. Some changes will have to be made to run MMBIRFinder on another user’s space.  
+
 --------------------------------------------------------------------------------
 
-MMBIRFinder
+(Old Instructions from forked project) MMBIRFinder
 =========
 
 MMBIRFinder is a bioinformatics tool to detect microhomology-mediated break-induced replication(MMBIR) events. 
