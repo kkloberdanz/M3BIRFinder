@@ -11,7 +11,7 @@ $ python configure.py
 $ make
 ```
 
-The binary can be found in ```bin```
+The binary can be found in ```Bin```
 
 --------------------------------------------------------------------------
     
