@@ -23,7 +23,8 @@ double mu = 0.0;
 double delta = 0.0;
 int arrIPath[1000][1000]; // the backtrack path for i
 int arrJPath[1000][1000]; // the backtrack path for j
-double matrix[1000][1000];
+//double matrix[1000][1000];
+vector<vector<double>> matrix(1000, vector<double>(1000, 0) );
 
 
 /*
@@ -158,7 +159,8 @@ t_alignment_struct getGlobalAlignment(string &seq1, string &seq2, double m, doub
 	delta = d;
 	string sBIR;
 	string sTemplate;
-	double matrix[seq1.length()+1][seq2.length()+1];
+	//double matrix[seq1.length()+1][seq2.length()+1];
+    vector<vector<double>> matrix (seq1.length()+1, vector<double> (seq2.length()+1, 0));
 	double temp[3]; // ******* CHANGE TO 4 FOR LOCAL ALIGNEMNT
 	int iCase;
 	int iLengthS1 = seq1.length();
@@ -167,12 +169,14 @@ t_alignment_struct getGlobalAlignment(string &seq1, string &seq2, double m, doub
 	t_alignment_struct tReturn;
 
 
+    /*
 	// initialize matrix to 0s
 	for (int i = 0; i <= iLengthS1; ++i){
 		for (int j = 0; j < iLengthS2; ++j){
 			matrix[i][j] = 0;
 		}
 	}
+    */
 
 	for (int i = 0; i <= iLengthS1; ++i)
 		matrix[i][0] = delta*i;

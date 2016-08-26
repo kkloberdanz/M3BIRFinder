@@ -244,7 +244,7 @@ int createParentReadsFromMySQL(){
 	int iReadsImported = 0;
 	int iChromosome = confDB.getKey("chromosome").intVal;
 	bool first = true;
-	unsigned int iMinConsolidate = confDB.getKey("minConsolidate").intVal; // the minimum number of reads to consolidate, otherwise don't add to vector
+	//unsigned int iMinConsolidate = confDB.getKey("minConsolidate").intVal; // the minimum number of reads to consolidate, otherwise don't add to vector
 	int iSkipped = 0;
 
 	for (string row; getline(input, row, '\n');){

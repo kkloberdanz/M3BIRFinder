@@ -1,5 +1,5 @@
 C++ = g++
-CFLAGS = -O2 -Wall -Wextra -Wpedantic
+CFLAGS = -O2 -Wall -Wextra -Wpedantic -std=gnu++11
 
 OBJS = main.o alignment.o ConfigDB.o templateFinder.o birAligner.o birConsolidate.o printOptions.o birFinder.o Fragment.o programExecution.o
 
