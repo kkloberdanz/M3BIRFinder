@@ -19,38 +19,38 @@
 using namespace std;
 
 struct t_chromosome {
-	string fastaHeader;
-	string samHeader;
-	string sequence;
+    string fastaHeader;
+    string samHeader;
+    string sequence;
 };
 
 struct t_consolidated{
-	string sReadName;
-	string sParentRead;
-	int iParentStart;
-	int iParentEnd;
-	int iBirStart;
-	int iBirEnd;
-	string sBir;
-	int iBirLength;
-	int iTemplateStart;
-	int iTemplateEnd;
-	string sTemplate;
-	int iTemplateLength;
-	bool bBirCandidateFound;
-	int iChromosome;
-	bool bAnchorLeft;
-	int iFlag;
-	bool bBadRead;
+    string sReadName;
+    string sParentRead;
+    int iParentStart;
+    int iParentEnd;
+    int iBirStart;
+    int iBirEnd;
+    string sBir;
+    int iBirLength;
+    int iTemplateStart;
+    int iTemplateEnd;
+    string sTemplate;
+    int iTemplateLength;
+    bool bBirCandidateFound;
+    int iChromosome;
+    bool bAnchorLeft;
+    int iFlag;
+    bool bBadRead;
 };
 
 struct t_alignment_struct{
-	int iEndPosI;
-	int iStartPosI;
-	int iEndPosJ;
-	int iStartPosJ;
-	string sAlignedRegionI;
-	string sAlignedRegionJ;
+    int iEndPosI;
+    int iStartPosI;
+    int iEndPosJ;
+    int iStartPosJ;
+    string sAlignedRegionI;
+    string sAlignedRegionJ;
 };
 
 // globals

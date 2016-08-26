@@ -13,30 +13,30 @@
 
 class ConfigDB {
 public:
-	ConfigDB(); // default constructor
-	ConfigDB(const char *fileName);
-	virtual ~ConfigDB();
+    ConfigDB(); // default constructor
+    ConfigDB(const char *fileName);
+    virtual ~ConfigDB();
 
-	struct Gen_Val {
-		bool boolVal;
-		double doubleVal;
-		unsigned long ulongVal;
-		int intVal;
-		std::string stringVal;
-		char charVal;
-	};
+    struct Gen_Val {
+        bool boolVal;
+        double doubleVal;
+        unsigned long ulongVal;
+        int intVal;
+        std::string stringVal;
+        char charVal;
+    };
 
-	std::string configFileName;
+    std::string configFileName;
 
-	Gen_Val getKey(const std::string key);
-	bool checkKey (const std::string key);
-	void setKey (std::string key, std::string val);
-	void initializeDB(const char *fileName);
-	void setConfigFile(const std::string &name);
-	void printConfigDB();
+    Gen_Val getKey(const std::string key);
+    bool checkKey (const std::string key);
+    void setKey (std::string key, std::string val);
+    void initializeDB(const char *fileName);
+    void setConfigFile(const std::string &name);
+    void printConfigDB();
 
 private:
-	std::map<std::string, std::string> keyVal;
+    std::map<std::string, std::string> keyVal;
 };
 
 
