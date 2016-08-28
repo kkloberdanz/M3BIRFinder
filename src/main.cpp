@@ -15,9 +15,16 @@
 #include <fstream>
 #include <unistd.h>
 
+#include <ctime>
+
 using namespace std;
 
+double get_end_time_ms(clock_t start_time) {
+    return 1000*(double)(clock() - start_time)/CLOCKS_PER_SEC;
+}
+
 int main(int argc, char *argv[]) {
+    clock_t start_time = clock();
     // start timing
     time0 = time(NULL);
 
@@ -40,28 +47,38 @@ int main(int argc, char *argv[]) {
     if (exec != 0)
         cout << "Exec exited with: " << exec << endl;
 
+    start_time = clock();
     // read in reference genome
-    readInReferenceGenome();
+    readInReferenceGenome(); 
+    cout << "readInReferenceGenome(): " << get_end_time_ms(start_time) << "ms" << endl;
 
+    start_time = clock();
     // find reads with one half anchored and the other unaligned
     int cand = startCandidateReads();
     if (cand != 0)
         cout << "startCandidateReads exited with: " << cand << endl;
+    cout << "startCandidateReads(): " << get_end_time_ms(start_time) << "ms" << endl;
 
+    start_time = clock();
     // consolidate reads to narrow down BIR locations
     int cons = startConsolidate();
     if (cons != 0)
         cout << "startConsolidate exited with: " << cons << endl;
+    cout << "startConsolidate(): " << get_end_time_ms(start_time) << "ms" << endl;
 
+    start_time = clock();
     // perform alignments to get candidate BIR locations
     int bir = startBirFinder();
     if (bir != 0)
         cout << "startBirFinder exited with: " << bir << endl;
+    cout << "startBirFinder(): " << get_end_time_ms(start_time) << "ms" << endl;
 
+    start_time = clock();
     // we have the possible bir strings and their respective locations so let's find the template to confirm
     int temp = startTemplateFinder();
     if (temp != 0)
         cout << "startTemplateFinder exited with: " << temp << endl;
+    cout << "startTemplateFinder(): " << get_end_time_ms(start_time) << "ms" << endl;
 
     return 0;
 }

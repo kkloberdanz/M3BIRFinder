@@ -1,0 +1,21 @@
+# original
+time nohup ./MMBIRFinder config-1.txt > ./Log/run0222.log 2>&1
+
+real    0m8.981s
+user    0m8.748s
+sys 0m0.148s
+
+# -O3
+time nohup ./m3birfinder config-1.txt > ./Log/run0222.log 2>&1
+
+real    0m8.560s
+user    0m8.330s
+sys 0m0.153s
+
+
+# -O3 vector
+time nohup ./m3birfinder config-1.txt > ./Log/run0222.log 2>&1
+
+real    0m8.816s
+user    0m8.480s
+sys 0m0.261s
