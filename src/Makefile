@@ -1,42 +1,44 @@
 C++ = g++
 CFLAGS = -O2 -Wall -Wextra -Wpedantic -std=gnu++11
 
-OBJS = main.o alignment.o ConfigDB.o templateFinder.o birAligner.o birConsolidate.o printOptions.o birFinder.o Fragment.o programExecution.o
+OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/alignment.o $(BUILD_DIR)/ConfigDB.o $(BUILD_DIR)/templateFinder.o $(BUILD_DIR)/birAligner.o $(BUILD_DIR)/birConsolidate.o $(BUILD_DIR)/printOptions.o $(BUILD_DIR)/birFinder.o $(BUILD_DIR)/Fragment.o $(BUILD_DIR)/programExecution.o
+
+BUILD_DIR = Build
 
 m3birfinder: $(OBJS)
 	$(C++) -o Bin/m3birfinder $(CFLAGS) $(OBJS) 
 
-main.o: main.cpp defs.h
-	$(C++) $(CFLAGS) -c main.cpp
+$(BUILD_DIR)/main.o: main.cpp defs.h
+	$(C++) $(CFLAGS) -o $(BUILD_DIR)/main.o -c main.cpp
 
-alignment.o: alignment.cpp defs.h
-	$(C++) $(CFLAGS) -c alignment.cpp
+$(BUILD_DIR)/alignment.o: alignment.cpp defs.h
+	$(C++) $(CFLAGS) -o $(BUILD_DIR)/alignment.o -c alignment.cpp
 
-ConfigDB.o: ConfigDB.cpp ConfigDB.h
-	$(C++) $(CFLAGS) -c ConfigDB.cpp 
+$(BUILD_DIR)/ConfigDB.o: ConfigDB.cpp ConfigDB.h
+	$(C++) $(CFLAGS) -o $(BUILD_DIR)/ConfigDB.o -c ConfigDB.cpp 
 
-templateFinder.o: templateFinder.cpp defs.h
-	$(C++) $(CFLAGS) -c templateFinder.cpp 
+$(BUILD_DIR)/templateFinder.o: templateFinder.cpp defs.h
+	$(C++) $(CFLAGS) -o $(BUILD_DIR)/templateFinder.o -c templateFinder.cpp 
 
-birAligner.o: birAligner.cpp defs.h
-	$(C++) $(CFLAGS) -c birAligner.cpp 
+$(BUILD_DIR)/birAligner.o: birAligner.cpp defs.h
+	$(C++) $(CFLAGS) -o $(BUILD_DIR)/birAligner.o -c birAligner.cpp 
 
-birConsolidate.o:
-	$(C++) $(CFLAGS) -c birConsolidate.cpp 
+$(BUILD_DIR)/birConsolidate.o:
+	$(C++) $(CFLAGS) -o $(BUILD_DIR)/birConsolidate.o -c birConsolidate.cpp 
 
-printOptions.o: printOptions.cpp defs.h
-	$(C++) $(CFLAGS) -c printOptions.cpp 
+$(BUILD_DIR)/printOptions.o: printOptions.cpp defs.h
+	$(C++) $(CFLAGS) -o $(BUILD_DIR)/printOptions.o -c printOptions.cpp 
 
-birFinder.o: birFinder.cpp
-	$(C++) $(CFLAGS) -c birFinder.cpp 
+$(BUILD_DIR)/birFinder.o: birFinder.cpp
+	$(C++) $(CFLAGS) -o $(BUILD_DIR)/birFinder.o -c birFinder.cpp 
 
-Fragment.o: Fragment.h
-	$(C++) $(CFLAGS) -c Fragment.cpp 
+$(BUILD_DIR)/Fragment.o: Fragment.h
+	$(C++) $(CFLAGS) -o $(BUILD_DIR)/Fragment.o -c Fragment.cpp 
 
-programExecution.o: defs.h
-	$(C++) $(CFLAGS) -c programExecution.cpp 
+$(BUILD_DIR)/programExecution.o: defs.h
+	$(C++) $(CFLAGS) -o $(BUILD_DIR)/programExecution.o -c programExecution.cpp 
 
 clean:
-	rm *.o
 	rm -rf Bin/*
+	rm -rf Build/*
 
