@@ -21,9 +21,16 @@ using namespace std;
 //double delta = confDB.getKey("delta").doubleVal;
 double mu = 0.0;
 double delta = 0.0;
-int arrIPath[1000][1000]; // the backtrack path for i
-int arrJPath[1000][1000]; // the backtrack path for j
+
+/*
+ * C style arrays are being phased out in lieu of std::vector
+ */ 
+//int arrIPath[1000][1000]; // the backtrack path for i
+//int arrJPath[1000][1000]; // the backtrack path for j
 //double matrix[1000][1000];
+
+vector<vector<int>> arrIPath(1000, vector<int>(1000, 0) ); // the backtrack path for i
+vector<vector<int>> arrJPath(1000, vector<int>(1000, 0) ); // the backtrack path for j
 vector<vector<double>> matrix(1000, vector<double>(1000, 0) );
 
 
