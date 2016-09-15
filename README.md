@@ -26,6 +26,8 @@ $bash
 
 Run M3BIRFinder with config-1.txt and designate log file location (Alignments take some time to run, maybe a long time with big reads files)
 
+Ensure that bwa is in the same directory as M3BIRFinder.
+
 ```bash
 $nohup ./M3BIRFinder config-1.txt > ./Log/run0222.log 2>&1
 ```

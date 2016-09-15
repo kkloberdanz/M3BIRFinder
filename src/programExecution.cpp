@@ -98,7 +98,7 @@ int executeBwaIndex(string sReferenceFile){
     // start BWA index
     cout << "\nstarting bwa index..." << endl;
     fLogFileOut << "\nstarting bwa index..." << endl;
-    command = "bwa index -a bwtsw " + sReferenceFile;
+    command = "./bwa index -a bwtsw " + sReferenceFile;
     system(command.c_str());
     cout << "bwa index finished..." << endl;
     fLogFileOut << "bwa index finished..." << endl;
@@ -112,7 +112,7 @@ int executeBwaAligner(string sReferenceFile, string sReadsFile, string sOutputFi
     // run the BWA alignment algorithm
     cout << "\nstarting bwa aligner..." << endl;
     fLogFileOut << "\nstarting bwa aligner..." << endl;
-    command = "bwa aln -n 4 " + sReferenceFile + " " + sProjectDirectory + sReadsFile + " | bwa samse " + sReferenceFile + " - " + sProjectDirectory + sReadsFile + " > " + sProjectDirectory + sOutputFile + ".sam";
+    command = "./bwa aln -n 4 " + sReferenceFile + " " + sProjectDirectory + sReadsFile + " | ./bwa samse " + sReferenceFile + " - " + sProjectDirectory + sReadsFile + " > " + sProjectDirectory + sOutputFile + ".sam";
     cout << "command: " << command << endl;
     system(command.c_str());
     cout << "bwa aligner finished..." << endl;
