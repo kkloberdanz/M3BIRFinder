@@ -17,6 +17,12 @@
 
 #include <ctime>
 #include <thread>
+#include "programExecution.h"
+
+
+#define NUM_THREADS 8 /* TODO: This is just testing, allow user
+                         to decide number of threads */
+                    
 
 using namespace std;
 
@@ -52,10 +58,32 @@ int main(int argc, char *argv[]) {
 
     start_time = clock();
     // execute the main alignment programs (BWA and samtools)
-    int exec = startExecutables();
+    
+    /* Changes start here */
+    std::vector<std::string> sReadsFile_v { "ALM29_ACTGAT_L008_R1_001.part_0.fastq", "ALM29_ACTGAT_L008_R1_001.part_1.fastq", "ALM29_ACTGAT_L008_R1_001.part_2.fastq", "ALM29_ACTGAT_L008_R1_001.part_3.fastq", "ALM29_ACTGAT_L008_R1_001.part_4.fastq", "ALM29_ACTGAT_L008_R1_001.part_5.fastq", "ALM29_ACTGAT_L008_R1_001.part_6.fastq", "ALM29_ACTGAT_L008_R1_001.part_7.fastq" };
+
+    // run this over several threads
+    thread t[NUM_THREADS];
+    for (int i = 0; i < NUM_THREADS; ++i) {
+        t[i] = thread(startExecutables, sReadsFile_v[i]);
+    }
+    /*
+
+    //int exec = startExecutables();
+
+    // join threads here
+    for (int i = 0; i < NUM_THREADS; ++i) {
+        t[i].join();
+    } 
+    */
+
+    /*
     if (exec != 0)
         cout << "Exec exited with: " << exec << endl;
     cout << "COMPLETED: startExecutables(): " << get_end_time_ms(start_time) << "ms" << endl;
+    */
+
+    /* Changes end here */
 
     start_time = clock();
     // read in reference genome

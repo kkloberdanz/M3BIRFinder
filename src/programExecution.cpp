@@ -23,7 +23,7 @@ using namespace std;
 
 std::mutex mtx;
 
-int startExecutables(){
+int startExecutables(string sReadsFile){
     cout << "\nStarting executables..." << endl;
     fLogFileOut << "\nStarting executables..." << endl;
     string sReferenceFile = confDB.getKey("referenceFile").stringVal; // the name of the reference file
