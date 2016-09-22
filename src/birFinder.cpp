@@ -15,6 +15,8 @@
 #include <sys/wait.h>
 #include <stdlib.h>
 
+#include <thread>
+
 using namespace std;
 
 struct t_read{
@@ -33,10 +35,14 @@ int startCandidateReads(){
         return 0;
 
     cout << "\nDB before: " << vCandidateReads.size() << endl;
+    cout << "writing to log file" << endl;
     fLogFileOut << "\nDB before: " << vCandidateReads.size() << endl;
+    cout << "writing to log file DONE" << endl;
 
     // Let's take the final unaligned reads and find the locations of the matched pair reads
+    cout << "createSplitReadDatabase" << endl;
     createSplitReadDatabase(sFinalAlignedFile + ".sam");
+    cout << "createSplitReadDatabase DONE" << endl;
 
     cout << "\nDB after: " << vCandidateReads.size() << endl;
     fLogFileOut << "\nDB after: " << vCandidateReads.size() << endl;

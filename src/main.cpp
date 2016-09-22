@@ -166,6 +166,7 @@ void printUsageAndExit(char *sName)
  * Program fails out somewhere in this function
  */
 void readInReferenceGenome(){
+    cout << "HERE0" << endl;
     cout << "\nReading in reference genome..." << endl;
     fLogFileOut << "\nReading in reference genome..." << endl;
     ifstream input;
