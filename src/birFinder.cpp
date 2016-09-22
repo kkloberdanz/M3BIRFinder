@@ -28,6 +28,7 @@ struct t_read{
 int startCandidateReads(){
     string sFinalAlignedFile = confDB.getKey("finalAlignedFile").stringVal;
 
+    cout << "Reached: startCandidateReads" << endl;
     if (confDB.getKey("performClustering").boolVal == false)
         return 0;
 

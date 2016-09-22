@@ -16,6 +16,7 @@
 #include <unistd.h>
 
 #include <ctime>
+#include <thread>
 
 using namespace std;
 
@@ -29,23 +30,32 @@ int main(int argc, char *argv[]) {
     time0 = time(NULL);
 
     // get command line arguments
+    start_time = clock();
     int cl = processCommandLine(argc, argv);
     if (cl != 0)
         cout << "Command line exited with: " << cl << endl;
 
+    cout << "COMPLETED: processCommandLine(): " << get_end_time_ms(start_time) << "ms" << endl;
+
+    start_time = clock();
     sBaseFileName = setupBaseFileName();
+    cout << "COMPLETED: setupBaseFileName(): " << get_end_time_ms(start_time) << "ms" << endl;
 
     // Set up general log file and project directory
+    start_time = clock();
     prepareLogFile(fLogFileOut,sBaseFileName,confDB.getKey("sLogDirName").stringVal);
     sProjectDirectory = confDB.getKey("projectDirectory").stringVal;
+    cout << "COMPLETED: prepareLogFile(): " << get_end_time_ms(start_time) << "ms" << endl;
 
     // Print the method configuration parameters
     printConfig(fLogFileOut);
 
+    start_time = clock();
     // execute the main alignment programs (BWA and samtools)
     int exec = startExecutables();
     if (exec != 0)
         cout << "Exec exited with: " << exec << endl;
+    cout << "COMPLETED: startExecutables(): " << get_end_time_ms(start_time) << "ms" << endl;
 
     start_time = clock();
     // read in reference genome
@@ -152,6 +162,9 @@ void printUsageAndExit(char *sName)
     exit(1);
 }
 
+/**
+ * Program fails out somewhere in this function
+ */
 void readInReferenceGenome(){
     cout << "\nReading in reference genome..." << endl;
     fLogFileOut << "\nReading in reference genome..." << endl;
@@ -161,6 +174,7 @@ void readInReferenceGenome(){
     int iChr = confDB.getKey("chromosome").intVal;
     int currChr = 1;
 
+    cout << "HERE1" << endl;
     input.open(confDB.getKey("referenceFile").stringVal.c_str());
 
     // check if file is open
@@ -168,8 +182,10 @@ void readInReferenceGenome(){
         cout << "\nThe reference file could not be found: " << confDB.getKey("referenceFile").stringVal << endl;
         exit(1);
     }
+    cout << "HERE2" << endl;
 
     for (string row; getline(input, row, '\n');){
+        cout << "HERE3" << endl;
         if (row[0] == '>'){
             if (first){
                 chromosome.fastaHeader = row.substr(1);
