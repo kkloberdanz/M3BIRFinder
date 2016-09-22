@@ -16,14 +16,22 @@
 #include <sys/wait.h>
 #include <stdlib.h>
 
+#include <thread>
+#include <mutex>
+
 using namespace std;
 
+std::mutex mtx;
 
 int startExecutables(){
     cout << "\nStarting executables..." << endl;
     fLogFileOut << "\nStarting executables..." << endl;
     string sReferenceFile = confDB.getKey("referenceFile").stringVal; // the name of the reference file
-    string sReadsFile = confDB.getKey("readsFile").stringVal; // the name of the reads file
+
+
+    //!!! Testing multithreading !!!
+    //string sReadsFile = confDB.getKey("readsFile").stringVal; // the name of the reads file
+
     string sUnalignedFile = confDB.getKey("unalignedFile").stringVal; // the name of the unaligned FASTA/SAM file
     string sOutputFile = confDB.getKey("outputFile").stringVal; // name of the output file from BWA aligner
     string sAlignedFile = confDB.getKey("alignedFile").stringVal; // name of the already aligned BAM file

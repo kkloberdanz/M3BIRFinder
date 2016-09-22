@@ -64,7 +64,9 @@ int createSplitReadDatabase(string sAlignedFilename){
     string sReadName;
     t_consolidated frag;
     int iChr = 0;
+    cout << "Getting key: chromosome" << endl;
     int chromosome = confDB.getKey("chromosome").intVal;
+    cout << "Got key: chromosome" << endl;
     int iExludedReads = 0;
     int iBadReads = 0;
     int index = 0;
