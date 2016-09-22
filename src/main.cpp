@@ -166,7 +166,6 @@ void printUsageAndExit(char *sName)
  * Program fails out somewhere in this function
  */
 void readInReferenceGenome(){
-    cout << "HERE0" << endl;
     cout << "\nReading in reference genome..." << endl;
     fLogFileOut << "\nReading in reference genome..." << endl;
     ifstream input;
@@ -175,7 +174,6 @@ void readInReferenceGenome(){
     int iChr = confDB.getKey("chromosome").intVal;
     int currChr = 1;
 
-    cout << "HERE1" << endl;
     input.open(confDB.getKey("referenceFile").stringVal.c_str());
 
     // check if file is open
@@ -183,10 +181,8 @@ void readInReferenceGenome(){
         cout << "\nThe reference file could not be found: " << confDB.getKey("referenceFile").stringVal << endl;
         exit(1);
     }
-    cout << "HERE2" << endl;
 
     for (string row; getline(input, row, '\n');){
-        cout << "HERE3" << endl;
         if (row[0] == '>'){
             if (first){
                 chromosome.fastaHeader = row.substr(1);
