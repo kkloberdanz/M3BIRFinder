@@ -21,9 +21,11 @@
 
 using namespace std;
 
-std::mutex mtx;
 
-int startExecutables(string sReadsFile){
+std::vector<std::string> sReadsFile_v { "ALM29_ACTGAT_L008_R1_001.part_0.fastq", "ALM29_ACTGAT_L008_R1_001.part_1.fastq", "ALM29_ACTGAT_L008_R1_001.part_2.fastq", "ALM29_ACTGAT_L008_R1_001.part_3.fastq", "ALM29_ACTGAT_L008_R1_001.part_4.fastq", "ALM29_ACTGAT_L008_R1_001.part_5.fastq", "ALM29_ACTGAT_L008_R1_001.part_6.fastq", "ALM29_ACTGAT_L008_R1_001.part_7.fastq" };
+
+void startExecutables(int reads_file_index){
+    string sReadsFile = sReadsFile_v[reads_file_index];
     cout << "\nStarting executables..." << endl;
     fLogFileOut << "\nStarting executables..." << endl;
     string sReferenceFile = confDB.getKey("referenceFile").stringVal; // the name of the reference file
@@ -97,7 +99,6 @@ int startExecutables(string sReadsFile){
     if (confDB.getKey("onlyAlign").boolVal == true)
         exit(1);
 
-    return 0;
 }
 
 int executeBwaIndex(string sReferenceFile){

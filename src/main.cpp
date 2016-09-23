@@ -20,11 +20,15 @@
 #include "programExecution.h"
 
 
-#define NUM_THREADS 8 /* TODO: This is just testing, allow user
-                         to decide number of threads */
+#define NUM_THREADS 8 // TODO: This is just testing, allow user
+                        //     to decide number of threads
                     
 
 using namespace std;
+
+void test_threads(int i) {
+    startExecutables(i);
+}
 
 double get_end_time_ms(clock_t start_time) {
     return 1000*(double)(clock() - start_time)/CLOCKS_PER_SEC;
@@ -60,14 +64,15 @@ int main(int argc, char *argv[]) {
     // execute the main alignment programs (BWA and samtools)
     
     /* Changes start here */
-    std::vector<std::string> sReadsFile_v { "ALM29_ACTGAT_L008_R1_001.part_0.fastq", "ALM29_ACTGAT_L008_R1_001.part_1.fastq", "ALM29_ACTGAT_L008_R1_001.part_2.fastq", "ALM29_ACTGAT_L008_R1_001.part_3.fastq", "ALM29_ACTGAT_L008_R1_001.part_4.fastq", "ALM29_ACTGAT_L008_R1_001.part_5.fastq", "ALM29_ACTGAT_L008_R1_001.part_6.fastq", "ALM29_ACTGAT_L008_R1_001.part_7.fastq" };
 
     // run this over several threads
+    /*
+    const int NUM_THREADS = sReadsFile_v.size();
+    */
     thread t[NUM_THREADS];
     for (int i = 0; i < NUM_THREADS; ++i) {
-        t[i] = thread(startExecutables, sReadsFile_v[i]);
+        t[i] = thread(test_threads, i);
     }
-    /*
 
     //int exec = startExecutables();
 
@@ -75,7 +80,6 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < NUM_THREADS; ++i) {
         t[i].join();
     } 
-    */
 
     /*
     if (exec != 0)

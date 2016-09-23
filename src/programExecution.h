@@ -23,9 +23,8 @@
 
 using namespace std;
 
-std::mutex mtx;
 
-int startExecutables(string sReadsFile);
+void startExecutables(int);
 
 int executeBwaIndex(string sReferenceFile);
 
