@@ -173,6 +173,13 @@ int processCommandLine(int argc, char* argv[])
             sJobId = argv[i];
             break;
 
+        case 'n':
+            cout << "Spliting over '" << argv[i+1] << "' files" << endl;
+            if (i >= argc)
+                printUsageAndExit(argv[0]);
+            //TODO split over argv[i+1] files
+            break;
+
         default:
             cerr << "Unknown Option: " << (pch - 1) << endl;
             printUsageAndExit(argv[0]);
