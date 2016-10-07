@@ -27,6 +27,7 @@ std::vector<std::string> sReadsFile_v { "ALM29_ACTGAT_L008_R1_001.part_0.fastq",
 
 void startExecutables(int reads_file_index){
     mtx.lock();
+    cout << "Launched from thread: " << reads_file_index << endl;
     string sReadsFile = sReadsFile_v[reads_file_index];
     cout << "\nStarting executables..." << endl;
     fLogFileOut << "\nStarting executables..." << endl;
@@ -105,18 +106,18 @@ void startExecutables(int reads_file_index){
 }
 
 int executeBwaIndex(string sReferenceFile){
-    mtx.lock();
+    //mtx.lock();
     string command;
 
     // start BWA index
     cout << "\nstarting bwa index..." << endl;
     fLogFileOut << "\nstarting bwa index..." << endl;
-    command = "./bwa index -a bwtsw &" + sReferenceFile + " &";
+    command = "./bwa index -a bwtsw " + sReferenceFile + " &";
     system(command.c_str());
     cout << "bwa index finished..." << endl;
     fLogFileOut << "bwa index finished..." << endl;
 
-    mtx.unlock();
+    //mtx.unlock();
     return 0;
 }
 

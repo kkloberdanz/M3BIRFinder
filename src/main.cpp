@@ -69,6 +69,7 @@ int main(int argc, char *argv[]) {
     /*
     const int NUM_THREADS = sReadsFile_v.size();
     */
+    cout << "Making threads" << endl;
     thread t[NUM_THREADS];
     for (int i = 0; i < NUM_THREADS; ++i) {
         t[i] = thread(test_threads, i);
