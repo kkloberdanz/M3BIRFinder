@@ -21,10 +21,12 @@
 
 using namespace std;
 
+std::mutex mtx;
 
 std::vector<std::string> sReadsFile_v { "ALM29_ACTGAT_L008_R1_001.part_0.fastq", "ALM29_ACTGAT_L008_R1_001.part_1.fastq", "ALM29_ACTGAT_L008_R1_001.part_2.fastq", "ALM29_ACTGAT_L008_R1_001.part_3.fastq", "ALM29_ACTGAT_L008_R1_001.part_4.fastq", "ALM29_ACTGAT_L008_R1_001.part_5.fastq", "ALM29_ACTGAT_L008_R1_001.part_6.fastq", "ALM29_ACTGAT_L008_R1_001.part_7.fastq" };
 
 void startExecutables(int reads_file_index){
+    mtx.lock();
     string sReadsFile = sReadsFile_v[reads_file_index];
     cout << "\nStarting executables..." << endl;
     fLogFileOut << "\nStarting executables..." << endl;
@@ -99,19 +101,22 @@ void startExecutables(int reads_file_index){
     if (confDB.getKey("onlyAlign").boolVal == true)
         exit(1);
 
+    mtx.unlock();
 }
 
 int executeBwaIndex(string sReferenceFile){
+    mtx.lock();
     string command;
 
     // start BWA index
     cout << "\nstarting bwa index..." << endl;
     fLogFileOut << "\nstarting bwa index..." << endl;
-    command = "./bwa index -a bwtsw " + sReferenceFile;
+    command = "./bwa index -a bwtsw &" + sReferenceFile + " &";
     system(command.c_str());
     cout << "bwa index finished..." << endl;
     fLogFileOut << "bwa index finished..." << endl;
 
+    mtx.unlock();
     return 0;
 }
 
