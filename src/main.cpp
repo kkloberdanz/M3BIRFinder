@@ -17,7 +17,9 @@
 
 #include <ctime>
 #include <thread>
+
 #include "programExecution.h"
+#include "BWA.hpp"
 
 
 #define NUM_THREADS 8 // TODO: This is just testing, allow user
@@ -26,9 +28,11 @@
 
 using namespace std;
 
+/*
 void test_threads(int i) {
     startExecutables(i);
 }
+*/
 
 double get_end_time_ms(clock_t start_time) {
     return 1000*(double)(clock() - start_time)/CLOCKS_PER_SEC;
@@ -69,6 +73,10 @@ int main(int argc, char *argv[]) {
     /*
     const int NUM_THREADS = sReadsFile_v.size();
     */
+    bir::BWA bwa_align;
+    bwa_align.startExecutables(0);
+
+    /*
     cout << "Making threads" << endl;
     thread t[NUM_THREADS];
     for (int i = 0; i < NUM_THREADS; ++i) {
@@ -82,6 +90,7 @@ int main(int argc, char *argv[]) {
         t[i].join();
     } 
     cout << "Threads rejoined" << endl;
+    */
 
     /*
     if (exec != 0)
