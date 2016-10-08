@@ -28,6 +28,13 @@ BWA::BWA() {
 }
 
 void BWA::startExecutables(int reads_file_index) {
+
+    /*
+     * TODO:
+     *     Create threads here, wrap if statements in their own functions,
+     *     launch threads over each function, and join before next function
+     */
+
     //mtx.lock();
     cout << "Launched from thread: " << reads_file_index << endl;
     std::string sReadsFile = sReadsFile_v[reads_file_index];
