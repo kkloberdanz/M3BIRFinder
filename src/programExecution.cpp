@@ -25,6 +25,14 @@ std::mutex mtx;
 
 std::vector<std::string> sReadsFile_v { "ALM29_ACTGAT_L008_R1_001.part_0.fastq", "ALM29_ACTGAT_L008_R1_001.part_1.fastq", "ALM29_ACTGAT_L008_R1_001.part_2.fastq", "ALM29_ACTGAT_L008_R1_001.part_3.fastq", "ALM29_ACTGAT_L008_R1_001.part_4.fastq", "ALM29_ACTGAT_L008_R1_001.part_5.fastq", "ALM29_ACTGAT_L008_R1_001.part_6.fastq", "ALM29_ACTGAT_L008_R1_001.part_7.fastq" };
 
+/*
+ * TODO:
+ *     Create threads here, wrap if statements in their own functions,
+ *     launch threads over each function, and join before next function
+ *
+ *     Make this file into the class "Executables"
+ *     Use singleton design to call from 'main'
+ */
 void startExecutables(int reads_file_index){
     mtx.lock();
     cout << "Launched from thread: " << reads_file_index << endl;
@@ -39,6 +47,8 @@ void startExecutables(int reads_file_index){
 
     string sUnalignedFile = confDB.getKey("unalignedFile").stringVal; // the name of the unaligned FASTA/SAM file
     string sOutputFile = confDB.getKey("outputFile").stringVal; // name of the output file from BWA aligner
+    // Debugging
+    cout << "Writing BWA results to : '" << sOutputFile << "'" << endl;
     string sAlignedFile = confDB.getKey("alignedFile").stringVal; // name of the already aligned BAM file
     string sFinalAlignedFile = confDB.getKey("finalAlignedFile").stringVal;
 
@@ -59,20 +69,25 @@ void startExecutables(int reads_file_index){
 
         // Then we get unaligned reads (flag of 0x4, 0x16)
         if (confDB.getKey("extractUnalignedReads").boolVal == true && confDB.getKey("bamFile").boolVal == false){
+
             if (getReads((sUnalignedFile + "_1"), (sOutputFile + "_1.sam"), "-f 4", "", true) != 0)
                 cout << "getReads 1 exited incorrectly" << endl;
+
         } else if (confDB.getKey("extractUnalignedReads").boolVal == true && confDB.getKey("bamFile").boolVal == true){
+
             if (getReads((sUnalignedFile + "_1"), (sAlignedFile), "-f 4", "", true) != 0)
                 cout << "getReads 1 exited incorrectly" << endl;
         }
 
         if (confDB.getKey("extractUnalignedReads").boolVal == true){
+
             // Next we take the unaligned reads SAM file and create a FASTA file
             if (convertSAMtoFASTA(sUnalignedFile + "_1") != 0)
                 cout << "convertSAMtoFASTA 1 exited incorrectly" << endl;
         }
 
         if (confDB.getKey("halfAlign").boolVal == true){
+
             // Now rerun the BWA aligner with the new unaligned reads file
             if (executeBwaAligner(sReferenceFile,(sUnalignedFile + "_1.fasta"), (sOutputFile + "_2")) != 0)
             cout << "BWA aligner 2 exited incorrectly" << endl;
@@ -82,6 +97,7 @@ void startExecutables(int reads_file_index){
             // Then we get unaligned reads (flag of 0x4, 0x16)
             /*if (getReads((sUnalignedFile + "_2"), (sOutputFile + "_2.sam"), "-f 4", "-f 16", false) != 0)
                 cout << "getReads 2 exited incorrectly" << endl;*/
+
             if (getReads((sUnalignedFile + "_2"), (sOutputFile + "_2.sam"), "-f 4", "", false) != 0)
                 cout << "getReads 2 exited incorrectly" << endl;
         }

@@ -81,6 +81,7 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < NUM_THREADS; ++i) {
         t[i].join();
     } 
+    cout << "Threads rejoined" << endl;
 
     /*
     if (exec != 0)
