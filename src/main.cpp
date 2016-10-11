@@ -23,6 +23,7 @@
 #include "BWA.hpp" 
 
 unsigned int NUM_THREADS = 1;
+std::string  PROGRAM_NAME;
 
 using namespace std;
 
@@ -37,6 +38,7 @@ double get_end_time_ms(clock_t start_time) {
 }
 
 int main(int argc, char *argv[]) {
+    PROGRAM_NAME = argv[0];
     clock_t start_time = clock();
     // start timing
     time0 = time(NULL);

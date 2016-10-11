@@ -109,12 +109,14 @@ void startExecutables(int reads_file_index){
 
 
             cout << "Making threads" << endl;
-            thread t[NUM_THREADS];
+            //thread t[NUM_THREADS];
+            std::vector<std::thread> t;
             for (int i = 0; i < NUM_THREADS; ++i) {
                 cout << "running run_full_align()" << endl;
                 //t[i] = thread(test_threads, i);
                 sReadsFile = sReadsFile_v[i];
-                t[i] = thread(run_full_align, i, sReferenceFile, sReadsFile, sOutputFile + std::to_string(i));
+                //t[i] = thread(run_full_align, i, sReferenceFile, sReadsFile, sOutputFile + std::to_string(i));
+                t.push_back(thread(run_full_align, i, sReferenceFile, sReadsFile, sOutputFile + std::to_string(i)));
             } 
 
             cout << "Waiting for the rest of the threads" << endl;
@@ -125,7 +127,10 @@ void startExecutables(int reads_file_index){
             cout << "Threads rejoined" << endl;
 
             cout << "Concatenating output files back into one file" << endl; 
-            system("rm -f " + sProjectDirectory + sOutputFile + "_1.sam");
+            {
+            std::string command = "rm -f " + sProjectDirectory + sOutputFile + "_1.sam";
+            system(command.c_str());
+            }
             for (int i = 0; i < NUM_THREADS; ++i) {
                 std::string command = "cat " + sProjectDirectory + sOutputFile + std::to_string(i) + "_1.sam >> " + sProjectDirectory + sOutputFile + "_1.sam"; 
                 system(command.c_str());
@@ -201,7 +206,10 @@ int executeBwaIndex(string sReferenceFile){
     fLogFileOut << "\nstarting bwa index..." << endl;
     command = "./bwa index -a bwtsw " + sReferenceFile;
     cout << "running command: " << command << endl;
-    system(command.c_str());
+    if (system(command.c_str()) != 0) {
+        cout << "error: ensure bwa is in the same directory as " << PROGRAM_NAME << endl;
+        std::exit(EXIT_FAILURE);
+    }
     cout << "bwa index finished..." << endl;
     fLogFileOut << "bwa index finished..." << endl;
 
