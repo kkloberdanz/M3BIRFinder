@@ -26,16 +26,23 @@ using namespace std;
 
 std::mutex mtx;
 
-std::vector<std::string> sReadsFile_v { "ALM29_ACTGAT_L008_R1_001.part_0.fastq", "ALM29_ACTGAT_L008_R1_001.part_1.fastq", "ALM29_ACTGAT_L008_R1_001.part_2.fastq", "ALM29_ACTGAT_L008_R1_001.part_3.fastq", "ALM29_ACTGAT_L008_R1_001.part_4.fastq", "ALM29_ACTGAT_L008_R1_001.part_5.fastq", "ALM29_ACTGAT_L008_R1_001.part_6.fastq", "ALM29_ACTGAT_L008_R1_001.part_7.fastq" };
-
 /*
- * TODO:
- *     Create threads here, wrap if statements in their own functions,
- *     launch threads over each function, and join before next function
- *
- *     Make this file into the class "Executables"
- *     Use singleton design to call from 'main'
- */
+std::vector<std::string> sReadsFile_v { "ALM29_ACTGAT_L008_R1_001.part_0.fastq", 
+                                        "ALM29_ACTGAT_L008_R1_001.part_1.fastq", 
+                                        "ALM29_ACTGAT_L008_R1_001.part_2.fastq", 
+                                        "ALM29_ACTGAT_L008_R1_001.part_3.fastq", 
+                                        "ALM29_ACTGAT_L008_R1_001.part_4.fastq", 
+                                        "ALM29_ACTGAT_L008_R1_001.part_5.fastq", 
+                                        "ALM29_ACTGAT_L008_R1_001.part_6.fastq", 
+                                        "ALM29_ACTGAT_L008_R1_001.part_7.fastq" };
+*/
+std::vector<std::string> sReadsFile_v;
+
+void build_reads_sReadsFile_v() {
+    for (unsigned int i = 0; i < NUM_THREADS; ++i) {
+        sReadsFile_v.push_back("ALM29_ACTGAT_L008_R1_001.part_" + std::to_string(i) + ".fastq");
+    }
+}
 
 void run_index_genome(std::string sReferenceFile) { 
     // First, we index the reference file
@@ -62,7 +69,8 @@ void run_get_reads(std::string sUnalignedFile,
 }
 
 void startExecutables(int reads_file_index){
-    mtx.lock();
+    //mtx.lock();
+    build_reads_sReadsFile_v();
     cout << "Launched from thread: " << reads_file_index << endl;
     string sReadsFile = sReadsFile_v[reads_file_index];
     cout << "\nStarting executables..." << endl;
@@ -116,9 +124,8 @@ void startExecutables(int reads_file_index){
             } 
             cout << "Threads rejoined" << endl;
 
-            // Concatenate the output files back into one file
-
-            //system("rm -f " + sProjectDirectory + sOutputFile + "_1.sam");
+            cout << "Concatenate output files back into one file" << endl; 
+            system("rm -f " + sProjectDirectory + sOutputFile + "_1.sam");
             for (int i = 0; i < NUM_THREADS; ++i) {
                 std::string command = "cat " + sProjectDirectory + sOutputFile + std::to_string(i) + "_1.sam >> " + sProjectDirectory + sOutputFile + "_1.sam"; 
                 system(command.c_str());
@@ -183,7 +190,7 @@ void startExecutables(int reads_file_index){
     if (confDB.getKey("onlyAlign").boolVal == true)
         exit(1);
 
-    mtx.unlock();
+    //mtx.unlock();
 }
 
 int executeBwaIndex(string sReferenceFile){

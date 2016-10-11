@@ -22,7 +22,7 @@
 #include "programExecution.h"
 #include "BWA.hpp" 
 
-unsigned int NUM_THREADS;
+unsigned int NUM_THREADS = 1;
 
 using namespace std;
 
