@@ -18,9 +18,7 @@
 #include <stdlib.h>
 
 #include <thread>
-#include <mutex>
-
-//#define NUM_THREADS 8
+#include <mutex> 
 
 using namespace std;
 
@@ -111,17 +109,16 @@ void startExecutables(int reads_file_index){
             cout << "Making threads" << endl;
             //thread t[NUM_THREADS];
             std::vector<std::thread> t;
-            for (int i = 0; i < NUM_THREADS; ++i) {
-                cout << "running run_full_align()" << endl;
+            cout << "running run_full_align()" << endl;
+            for (unsigned int i = 0; i < NUM_THREADS; ++i) {
                 //t[i] = thread(test_threads, i);
                 sReadsFile = sReadsFile_v[i];
                 //t[i] = thread(run_full_align, i, sReferenceFile, sReadsFile, sOutputFile + std::to_string(i));
                 t.push_back(thread(run_full_align, i, sReferenceFile, sReadsFile, sOutputFile + std::to_string(i)));
             } 
 
-            cout << "Waiting for the rest of the threads" << endl;
             // join threads here
-            for (int i = 0; i < NUM_THREADS; ++i) {
+            for (unsigned int i = 0; i < NUM_THREADS; ++i) {
                 t[i].join();
             } 
             cout << "Threads rejoined" << endl;
@@ -131,7 +128,7 @@ void startExecutables(int reads_file_index){
             std::string command = "rm -f " + sProjectDirectory + sOutputFile + "_1.sam";
             system(command.c_str());
             }
-            for (int i = 0; i < NUM_THREADS; ++i) {
+            for (unsigned int i = 0; i < NUM_THREADS; ++i) {
                 std::string command = "cat " + sProjectDirectory + sOutputFile + std::to_string(i) + "_1.sam >> " + sProjectDirectory + sOutputFile + "_1.sam"; 
                 system(command.c_str());
             }
