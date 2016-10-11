@@ -124,7 +124,7 @@ void startExecutables(int reads_file_index){
             } 
             cout << "Threads rejoined" << endl;
 
-            cout << "Concatenate output files back into one file" << endl; 
+            cout << "Concatenating output files back into one file" << endl; 
             system("rm -f " + sProjectDirectory + sOutputFile + "_1.sam");
             for (int i = 0; i < NUM_THREADS; ++i) {
                 std::string command = "cat " + sProjectDirectory + sOutputFile + std::to_string(i) + "_1.sam >> " + sProjectDirectory + sOutputFile + "_1.sam"; 
