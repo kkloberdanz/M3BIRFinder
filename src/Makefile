@@ -1,21 +1,21 @@
 C++ = g++
 CFLAGS = -O2 -Wall -Wextra -Wpedantic -std=gnu++11 -pthread
 
-OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/alignment.o $(BUILD_DIR)/ConfigDB.o $(BUILD_DIR)/templateFinder.o $(BUILD_DIR)/birAligner.o $(BUILD_DIR)/birConsolidate.o $(BUILD_DIR)/printOptions.o $(BUILD_DIR)/birFinder.o $(BUILD_DIR)/Fragment.o $(BUILD_DIR)/BWA.o #$(BUILD_DIR)/programExecution.o
+OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/alignment.o $(BUILD_DIR)/ConfigDB.o $(BUILD_DIR)/templateFinder.o $(BUILD_DIR)/birAligner.o $(BUILD_DIR)/birConsolidate.o $(BUILD_DIR)/printOptions.o $(BUILD_DIR)/birFinder.o $(BUILD_DIR)/Fragment.o $(BUILD_DIR)/programExecution.o
 
 BUILD_DIR = Build
 
 m3birfinder: $(OBJS)
 	$(C++) -o Bin/m3birfinder $(CFLAGS) $(OBJS) 
 
-$(BUILD_DIR)/main.o: main.cpp defs.h programExecution.h programExecution.cpp
+$(BUILD_DIR)/main.o: main.cpp defs.h programExecution.h programExecution.cpp globals.h
 	$(C++) $(CFLAGS) -o $(BUILD_DIR)/main.o -c main.cpp
 
 $(BUILD_DIR)/alignment.o: alignment.cpp defs.h
 	$(C++) $(CFLAGS) -o $(BUILD_DIR)/alignment.o -c alignment.cpp
 
-$(BUILD_DIR)/BWA.o: BWA.cpp defs.h BWA.hpp
-	$(C++) $(CFLAGS) -o $(BUILD_DIR)/BWA.o -c BWA.cpp 
+#$(BUILD_DIR)/BWA.o: BWA.cpp defs.h BWA.hpp
+	#$(C++) $(CFLAGS) -o $(BUILD_DIR)/BWA.o -c BWA.cpp 
 
 $(BUILD_DIR)/ConfigDB.o: ConfigDB.cpp ConfigDB.h
 	$(C++) $(CFLAGS) -o $(BUILD_DIR)/ConfigDB.o -c ConfigDB.cpp 
@@ -38,8 +38,8 @@ $(BUILD_DIR)/birFinder.o: birFinder.cpp
 $(BUILD_DIR)/Fragment.o: Fragment.h
 	$(C++) $(CFLAGS) -o $(BUILD_DIR)/Fragment.o -c Fragment.cpp 
 
-#$(BUILD_DIR)/programExecution.o: defs.h
-	#$(C++) $(CFLAGS) -o $(BUILD_DIR)/programExecution.o -c programExecution.cpp 
+$(BUILD_DIR)/programExecution.o: defs.h programExecution.cpp globals.h
+	$(C++) $(CFLAGS) -o $(BUILD_DIR)/programExecution.o -c programExecution.cpp 
 
 clean:
 	rm -rf Bin/*

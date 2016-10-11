@@ -16,9 +16,14 @@ class BWA {
     int convertSAMtoFASTA(std::string);
     int filterOut (std::string, std::string, std::string, std::string);
 
+    // called from within startExecutables()
+    void run_alignment(std::string);
+    void run_full_align(std::string, std::string, std::string);
+    void run_get_reads(std::string, std::string, std::string, std::string, bool);
+
   public:
     BWA();
     void startExecutables(int);
-};
-}
+}; // class BWA
+} // namespace bir
 #endif //BWA_HPP

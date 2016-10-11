@@ -12,6 +12,12 @@
 #include "defs.h"
 #include "BWA.hpp"
 
+#define NUM_THREADS 8 // TODO: This is just testing, allow user
+                        //     to decide number of threads
+void test_run_alignment(std::string s) {
+    run_alignment(s);
+}
+
 namespace bir {
 
 BWA::BWA() { 
@@ -55,29 +61,41 @@ void BWA::startExecutables(int reads_file_index) {
 
     if (confDB.getKey("runAlignment").boolVal == true) {
 
+
         if (confDB.getKey("indexGenome").boolVal == true){
-            // First, we index the reference file
-            if (executeBwaIndex(sReferenceFile) != 0)
-                cout << "BWA index exited incorrectly" << endl;
+
+            cout << "Making threads" << endl;
+            thread t[NUM_THREADS];
+            for (int i = 0; i < NUM_THREADS; ++i) {
+                // function call here
+                //t[i] = thread(run_alignment, sReferenceFile);
+                t[i] = thread(test_run_alignment, sReferenceFile);
+            } 
+
+            for (int i = 0; i < NUM_THREADS; ++i) {
+                t[i].join();
+            } 
+            cout << "Threads rejoined" << endl;
+
         }
 
         if (confDB.getKey("fullAlign").boolVal == true){
-            // Next, we run the BWA algorithm on FULL dataset reads
-            if (executeBwaAligner(sReferenceFile, sReadsFile, (sOutputFile + "_1")) != 0)
-                cout << "BWA aligner 1 exited incorrectly" << endl;
+            run_full_align(sReferenceFile, sReadsFile, (sOutputFile + "_1"));
         }
-        // TODO make the change to allow paired-end reads (need to remove -f 16 for getReads)
 
         // Then we get unaligned reads (flag of 0x4, 0x16)
         if (confDB.getKey("extractUnalignedReads").boolVal == true && confDB.getKey("bamFile").boolVal == false){
 
-            if (getReads((sUnalignedFile + "_1"), (sOutputFile + "_1.sam"), "-f 4", "", true) != 0)
-                cout << "getReads 1 exited incorrectly" << endl;
+            run_get_reads((sUnalignedFile + "_1"), (sOutputFile + "_1.sam"), "-f 4", "", true);
 
         } else if (confDB.getKey("extractUnalignedReads").boolVal == true && confDB.getKey("bamFile").boolVal == true){
 
+            run_get_reads((sUnalignedFile + "_1"), sAlignedFile, "-f 4", "", true);
+
+            /*
             if (getReads((sUnalignedFile + "_1"), (sAlignedFile), "-f 4", "", true) != 0)
                 cout << "getReads 1 exited incorrectly" << endl;
+            */
         }
 
         if (confDB.getKey("extractUnalignedReads").boolVal == true){
@@ -130,7 +148,7 @@ int BWA::executeBwaIndex(std::string sReferenceFile) {
     // start BWA index
     cout << "\nstarting bwa index..." << endl;
     fLogFileOut << "\nstarting bwa index..." << endl;
-    command = "./bwa index -a bwtsw " + sReferenceFile + " &";
+    command = "./bwa index -a bwtsw " + sReferenceFile;
     system(command.c_str());
     cout << "bwa index finished..." << endl;
     fLogFileOut << "bwa index finished..." << endl;

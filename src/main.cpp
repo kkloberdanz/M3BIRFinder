@@ -9,6 +9,7 @@
 #define MAIN_CPP_
 
 #include "defs.h"
+#include "globals.h"
 
 #include <iostream>
 #include <stdlib.h>
@@ -19,12 +20,9 @@
 #include <thread>
 
 #include "programExecution.h"
-#include "BWA.hpp"
+#include "BWA.hpp" 
 
-
-#define NUM_THREADS 8 // TODO: This is just testing, allow user
-                        //     to decide number of threads
-                    
+unsigned int NUM_THREADS;
 
 using namespace std;
 
@@ -73,8 +71,9 @@ int main(int argc, char *argv[]) {
     /*
     const int NUM_THREADS = sReadsFile_v.size();
     */
-    bir::BWA bwa_align;
-    bwa_align.startExecutables(0);
+    //bir::BWA bwa_align;
+    //bwa_align.startExecutables(0);
+    startExecutables(1);
 
     /*
     cout << "Making threads" << endl;
@@ -185,13 +184,14 @@ int processCommandLine(int argc, char* argv[])
             break;
 
         case 'n':
-            cout << "Spliting over '" << argv[i+1] << "' files" << endl;
             if (i >= argc)
                 printUsageAndExit(argv[0]);
+            NUM_THREADS = atoi(argv[++i]);
+            cout << "Spliting over '" << NUM_THREADS << "' files" << endl;
             //TODO split over argv[i+1] files
             break;
 
-        default:
+        default: 
             cerr << "Unknown Option: " << (pch - 1) << endl;
             printUsageAndExit(argv[0]);
             break;
@@ -207,6 +207,7 @@ void printUsageAndExit(char *sName)
             << " -?                    Command line options\n"
             << " configFile            Program configuration file name\n"
             << " -j jobIdString        Identifier to be used for this job\n"
+            << " -n number of threads  Default = 1, (Reccomended: " << std::thread::hardware_concurrency() << ")\n"
             << " -OconfOption=Value    Override options in the configuration file here\n\n";
 
     exit(1);

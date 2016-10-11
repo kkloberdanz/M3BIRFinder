@@ -7,6 +7,7 @@
 
 
 #include "defs.h"
+#include "globals.h"
 
 #include <iostream>
 #include <fstream>
@@ -18,6 +19,8 @@
 
 #include <thread>
 #include <mutex>
+
+//#define NUM_THREADS 8
 
 using namespace std;
 
@@ -33,6 +36,31 @@ std::vector<std::string> sReadsFile_v { "ALM29_ACTGAT_L008_R1_001.part_0.fastq",
  *     Make this file into the class "Executables"
  *     Use singleton design to call from 'main'
  */
+
+void run_index_genome(std::string sReferenceFile) { 
+    // First, we index the reference file
+    if (executeBwaIndex(sReferenceFile) != 0)
+        cout << "BWA index exited incorrectly" << endl;
+}
+
+void run_full_align(int threadnum, std::string sReferenceFile, std::string sReadsFile, std::string sOutputFile) {
+    //mtx.lock();
+    cout << "running thread: " << threadnum << endl;
+    // Next, we run the BWA algorithm on FULL dataset reads
+    if (executeBwaAligner(sReferenceFile, sReadsFile, (sOutputFile + "_1")) != 0)
+        cout << "BWA aligner 1 exited incorrectly" << endl;
+    //mtx.unlock();
+}
+
+void run_get_reads(std::string sUnalignedFile, 
+                   std::string sOutputFile, 
+                   std::string option1, 
+                   std::string option2, 
+                   bool b) {
+    if (getReads(sUnalignedFile, sOutputFile, option1, option2, b) != 0)
+        cout << "getReads 1 exited incorrectly" << endl;
+}
+
 void startExecutables(int reads_file_index){
     mtx.lock();
     cout << "Launched from thread: " << reads_file_index << endl;
@@ -40,9 +68,9 @@ void startExecutables(int reads_file_index){
     cout << "\nStarting executables..." << endl;
     fLogFileOut << "\nStarting executables..." << endl;
     string sReferenceFile = confDB.getKey("referenceFile").stringVal; // the name of the reference file
+    cout << "reference file: " << sReferenceFile << endl;
 
 
-    //!!! Testing multithreading !!!
     //string sReadsFile = confDB.getKey("readsFile").stringVal; // the name of the reads file
 
     string sUnalignedFile = confDB.getKey("unalignedFile").stringVal; // the name of the unaligned FASTA/SAM file
@@ -56,31 +84,65 @@ void startExecutables(int reads_file_index){
 
         if (confDB.getKey("indexGenome").boolVal == true){
             // First, we index the reference file
+            /*
             if (executeBwaIndex(sReferenceFile) != 0)
                 cout << "BWA index exited incorrectly" << endl;
+            */
+            cout << "running run_index_genome()" << endl;
+            run_index_genome(sReferenceFile);
         }
 
         if (confDB.getKey("fullAlign").boolVal == true){
             // Next, we run the BWA algorithm on FULL dataset reads
+            /*
             if (executeBwaAligner(sReferenceFile, sReadsFile, (sOutputFile + "_1")) != 0)
                 cout << "BWA aligner 1 exited incorrectly" << endl;
+            */
+
+
+            cout << "Making threads" << endl;
+            thread t[NUM_THREADS];
+            for (int i = 0; i < NUM_THREADS; ++i) {
+                cout << "running run_full_align()" << endl;
+                //t[i] = thread(test_threads, i);
+                sReadsFile = sReadsFile_v[i];
+                t[i] = thread(run_full_align, i, sReferenceFile, sReadsFile, sOutputFile + std::to_string(i));
+            } 
+
+            cout << "Waiting for the rest of the threads" << endl;
+            // join threads here
+            for (int i = 0; i < NUM_THREADS; ++i) {
+                t[i].join();
+            } 
+            cout << "Threads rejoined" << endl;
+
+            // Concatenate the output files back into one file
+
+            //system("rm -f " + sProjectDirectory + sOutputFile + "_1.sam");
+            for (int i = 0; i < NUM_THREADS; ++i) {
+                std::string command = "cat " + sProjectDirectory + sOutputFile + std::to_string(i) + "_1.sam >> " + sProjectDirectory + sOutputFile + "_1.sam"; 
+                system(command.c_str());
+            }
         }
         // TODO make the change to allow paired-end reads (need to remove -f 16 for getReads)
 
         // Then we get unaligned reads (flag of 0x4, 0x16)
         if (confDB.getKey("extractUnalignedReads").boolVal == true && confDB.getKey("bamFile").boolVal == false){
 
+            cout << "running getReads()" << endl;
             if (getReads((sUnalignedFile + "_1"), (sOutputFile + "_1.sam"), "-f 4", "", true) != 0)
                 cout << "getReads 1 exited incorrectly" << endl;
 
         } else if (confDB.getKey("extractUnalignedReads").boolVal == true && confDB.getKey("bamFile").boolVal == true){
 
+            cout << "running getReads()" << endl;
             if (getReads((sUnalignedFile + "_1"), (sAlignedFile), "-f 4", "", true) != 0)
                 cout << "getReads 1 exited incorrectly" << endl;
         }
 
         if (confDB.getKey("extractUnalignedReads").boolVal == true){
 
+            cout << "running convertSAMtoFASTA()" << endl;
             // Next we take the unaligned reads SAM file and create a FASTA file
             if (convertSAMtoFASTA(sUnalignedFile + "_1") != 0)
                 cout << "convertSAMtoFASTA 1 exited incorrectly" << endl;
@@ -88,6 +150,7 @@ void startExecutables(int reads_file_index){
 
         if (confDB.getKey("halfAlign").boolVal == true){
 
+            cout << "running executeBwaAligner()" << endl;
             // Now rerun the BWA aligner with the new unaligned reads file
             if (executeBwaAligner(sReferenceFile,(sUnalignedFile + "_1.fasta"), (sOutputFile + "_2")) != 0)
             cout << "BWA aligner 2 exited incorrectly" << endl;
@@ -98,6 +161,7 @@ void startExecutables(int reads_file_index){
             /*if (getReads((sUnalignedFile + "_2"), (sOutputFile + "_2.sam"), "-f 4", "-f 16", false) != 0)
                 cout << "getReads 2 exited incorrectly" << endl;*/
 
+            cout << "running getReads()" << endl;
             if (getReads((sUnalignedFile + "_2"), (sOutputFile + "_2.sam"), "-f 4", "", false) != 0)
                 cout << "getReads 2 exited incorrectly" << endl;
         }
@@ -106,6 +170,7 @@ void startExecutables(int reads_file_index){
             // Finally lets take the new BWA SAM file and use samtools to find the matches (flag 0x0)
             /*if (filterOut(("bwaAligned"), (sOutputFile + "_2"), "-F 4", "-F 16") != 0)
                 cout << "getReads 3 exited incorrectly" << endl;*/
+            cout << "running filterOut()" << endl;
             if (filterOut((sFinalAlignedFile), (sOutputFile + "_2"), "-F 4", "") != 0)
                 cout << "getReads 3 exited incorrectly" << endl;
         }
@@ -122,18 +187,17 @@ void startExecutables(int reads_file_index){
 }
 
 int executeBwaIndex(string sReferenceFile){
-    //mtx.lock();
     string command;
 
     // start BWA index
     cout << "\nstarting bwa index..." << endl;
     fLogFileOut << "\nstarting bwa index..." << endl;
-    command = "./bwa index -a bwtsw " + sReferenceFile + " &";
+    command = "./bwa index -a bwtsw " + sReferenceFile;
+    cout << "running command: " << command << endl;
     system(command.c_str());
     cout << "bwa index finished..." << endl;
     fLogFileOut << "bwa index finished..." << endl;
 
-    //mtx.unlock();
     return 0;
 }
 
@@ -277,3 +341,4 @@ int filterOut (string sOutputFile, string sInputFile, string sFlag1, string sFla
     }
     return 0;
 }
+
