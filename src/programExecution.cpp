@@ -50,7 +50,8 @@ void run_index_genome(std::string sReferenceFile) {
 
 void run_full_align(int threadnum, std::string sReferenceFile, std::string sReadsFile, std::string sOutputFile) {
     //mtx.lock();
-    cout << "running thread: " << threadnum << endl;
+    if (threadnum)
+        cout << "running thread: " << threadnum << endl;
     // Next, we run the BWA algorithm on FULL dataset reads
     if (executeBwaAligner(sReferenceFile, sReadsFile, (sOutputFile + "_1")) != 0)
         cout << "BWA aligner 1 exited incorrectly" << endl;
@@ -106,32 +107,43 @@ void startExecutables(int reads_file_index){
             */
 
 
-            cout << "Making threads" << endl;
-            //thread t[NUM_THREADS];
-            std::vector<std::thread> t;
-            cout << "running run_full_align()" << endl;
-            for (unsigned int i = 0; i < NUM_THREADS; ++i) {
-                //t[i] = thread(test_threads, i);
-                sReadsFile = sReadsFile_v[i];
-                //t[i] = thread(run_full_align, i, sReferenceFile, sReadsFile, sOutputFile + std::to_string(i));
-                t.push_back(thread(run_full_align, i, sReferenceFile, sReadsFile, sOutputFile + std::to_string(i)));
-            } 
+            if (NUM_THREADS > 1) {
+                cout << "Making threads" << endl;
+                //thread t[NUM_THREADS];
+                std::vector<std::thread> t;
+                cout << "running run_full_align()" << endl;
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
+                    //t[i] = thread(test_threads, i);
+                    sReadsFile = sReadsFile_v[i];
+                    //t[i] = thread(run_full_align, i, sReferenceFile, sReadsFile, sOutputFile + std::to_string(i));
+                    t.push_back(thread(run_full_align, i, sReferenceFile, sReadsFile, sOutputFile + std::to_string(i)));
+                } 
 
-            // join threads here
-            for (unsigned int i = 0; i < NUM_THREADS; ++i) {
-                t[i].join();
-            } 
-            cout << "Threads rejoined" << endl;
+                // join threads here
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
+                    t[i].join();
+                } 
+                cout << "Threads rejoined" << endl;
 
-            cout << "Concatenating output files back into one file" << endl; 
-            {
-            std::string command = "rm -f " + sProjectDirectory + sOutputFile + "_1.sam";
-            system(command.c_str());
-            }
-            for (unsigned int i = 0; i < NUM_THREADS; ++i) {
-                std::string command = "cat " + sProjectDirectory + sOutputFile + std::to_string(i) + "_1.sam >> " + sProjectDirectory + sOutputFile + "_1.sam"; 
+                cout << "Concatenating output files back into one file" << endl; 
+
+                {
+                std::string command = "rm -f " + sProjectDirectory + sOutputFile + "_1.sam";
                 system(command.c_str());
+                } 
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
+                    std::string command = "cat " + sProjectDirectory + sOutputFile + std::to_string(i) + "_1.sam >> " + sProjectDirectory + sOutputFile + "_1.sam"; 
+                    system(command.c_str());
+                }
+
+
+            } else {
+                run_full_align(0, sReferenceFile, sReadsFile, sOutputFile);
             }
+
+            /* Debugging */
+            //std::exit(EXIT_SUCCESS);
+
         }
         // TODO make the change to allow paired-end reads (need to remove -f 16 for getReads)
 
