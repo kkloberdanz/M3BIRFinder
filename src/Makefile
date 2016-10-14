@@ -1,5 +1,5 @@
 C++ = g++
-CFLAGS = -O2 -Wall -Wextra -Wpedantic -std=gnu++11 -pthread
+CFLAGS = -O2 -Wall -Wextra -Wpedantic -std=gnu++14 -pthread
 
 OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/alignment.o $(BUILD_DIR)/ConfigDB.o $(BUILD_DIR)/templateFinder.o $(BUILD_DIR)/birAligner.o $(BUILD_DIR)/birConsolidate.o $(BUILD_DIR)/printOptions.o $(BUILD_DIR)/birFinder.o $(BUILD_DIR)/Fragment.o $(BUILD_DIR)/programExecution.o
 
