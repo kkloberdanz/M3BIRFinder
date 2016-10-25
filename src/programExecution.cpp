@@ -49,7 +49,8 @@ void run_full_align(unsigned int threadnum, std::string sReferenceFile, std::str
 }
 
 void remove_header(std::string filename) {
-    std::string command = "sed -i '/^@/d' " + filename;
+    //std::string command = "sed -i '/^@/d' " + filename;
+    std::string command = "sed -i -e 1,18d " + filename;
     cout << command << endl;
     system(command.c_str());
 }
@@ -137,7 +138,7 @@ int startExecutables(int reads_file_index){
             sReadsFile = confDB.getKey("readsFile").stringVal; // the name of the reads file
 
             /* Debugging */
-            std::exit(EXIT_SUCCESS);
+            //std::exit(EXIT_SUCCESS);
 
         }
 
@@ -166,12 +167,10 @@ int startExecutables(int reads_file_index){
             } else {
                 run_full_align(0, sReferenceFile, sReadsFile, sOutputFile);
             }
-            */
-            /*
             cout << "running getReads()" << endl;
+            */
             if (getReads((sUnalignedFile + "_1"), (sOutputFile + "_1.sam"), "-f 4", "", true) != 0)
                 cout << "getReads 1 exited incorrectly" << endl;
-            */
 
         } else if (confDB.getKey("extractUnalignedReads").boolVal == true && confDB.getKey("bamFile").boolVal == true){
 
