@@ -209,7 +209,7 @@ void printUsageAndExit(char *sName)
             << " -?                    Command line options\n"
             << " configFile            Program configuration file name\n"
             << " -j jobIdString        Identifier to be used for this job\n"
-            << " -n number of threads  Default = 1, (Reccomended: " << std::thread::hardware_concurrency() << ")\n"
+            << " -n number of threads  Default = 1, (Cores available: " << std::thread::hardware_concurrency() << ")\n"
             << " -OconfOption=Value    Override options in the configuration file here\n\n";
 
     exit(1);
