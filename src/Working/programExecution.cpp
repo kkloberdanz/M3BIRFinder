@@ -50,40 +50,9 @@ void run_full_align(unsigned int threadnum, std::string sReferenceFile, std::str
 
 void remove_header(std::string filename) {
     //std::string command = "sed -i '/^@/d' " + filename;
-	/*
     std::string command = "sed -i -e 1,18d " + filename;
     cout << command << endl;
     system(command.c_str());
-	*/
-
-    mtx.lock();
-    std::cout << "Removing header from: " << filename << std::endl;
-
-    std::ifstream input;
-    input.open(filename);
-    //std::vector<std::string> whole_file;
-    std::string   line = "";
-    std::ofstream output;
-    output.open(filename + ".tmp");
-
-    mtx.unlock();
-    bool keep_line = false;
-    int i = 0;
-    while (std::getline(input, line)) { 
-
-        if (line[0] != '@') {
-            keep_line = true;
-        }
-
-        if (keep_line) {
-            output << line + '\n';
-        }
-    }
-
-    mtx.lock();
-    std::string command = "mv " + filename + ".tmp " + filename;
-    system(command.c_str());
-    mtx.unlock();
 }
 
 void run_get_reads(unsigned int threadnum,
@@ -153,27 +122,6 @@ int startExecutables(int reads_file_index){
                 std::string command = "rm -f " + sProjectDirectory + sOutputFile + "_1.sam";
                 system(command.c_str());
                 } 
-
-                /*
-                if (NUM_THREADS > 1) {
-                    cout << "Making threads" << endl;
-                    std::vector<std::thread> t;
-                    cout << "running run_get_reads()" << endl;
-                    for (unsigned int i = 0; i < NUM_THREADS; ++i) {
-                        t.push_back(thread(remove_header, sProjectDirectory + sOutputFile + std::to_string(i) + "_1.sam"));
-                    } 
-
-                    // join threads here
-                    for (unsigned int i = 0; i < NUM_THREADS; ++i) {
-                        t[i].join();
-                    } 
-                    cout << "Threads rejoined" << endl;
-
-                } else {
-                    run_full_align(0, sReferenceFile, sReadsFile, sOutputFile);
-                }
-                */
-
                 for (unsigned int i = 0; i < NUM_THREADS; ++i) {
                     if (i > 0) {
                         remove_header(sProjectDirectory + sOutputFile + std::to_string(i) + "_1.sam");
