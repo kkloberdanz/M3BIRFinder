@@ -48,6 +48,10 @@ void run_full_align(unsigned int threadnum, std::string sReferenceFile, std::str
         cout << "BWA aligner 1 exited incorrectly" << endl;
 }
 
+void run_convertSAMtoFASTA(std::string sUnalignedFile) {
+    convertSAMtoFASTA(sUnalignedFile);
+}
+
 void remove_header(std::string filename) {
     //std::string command = "sed -i '/^@/d' " + filename;
 	/*
@@ -147,33 +151,13 @@ int startExecutables(int reads_file_index){
                 } 
                 cout << "Threads rejoined" << endl;
 
+                /*
+                // concatenate outputx_1 files into 1 file
                 cout << "Concatenating output files back into one file" << endl; 
-
                 {
                 std::string command = "rm -f " + sProjectDirectory + sOutputFile + "_1.sam";
                 system(command.c_str());
                 } 
-
-                /*
-                if (NUM_THREADS > 1) {
-                    cout << "Making threads" << endl;
-                    std::vector<std::thread> t;
-                    cout << "running run_get_reads()" << endl;
-                    for (unsigned int i = 0; i < NUM_THREADS; ++i) {
-                        t.push_back(thread(remove_header, sProjectDirectory + sOutputFile + std::to_string(i) + "_1.sam"));
-                    } 
-
-                    // join threads here
-                    for (unsigned int i = 0; i < NUM_THREADS; ++i) {
-                        t[i].join();
-                    } 
-                    cout << "Threads rejoined" << endl;
-
-                } else {
-                    run_full_align(0, sReferenceFile, sReadsFile, sOutputFile);
-                }
-                */
-
                 for (unsigned int i = 0; i < NUM_THREADS; ++i) {
                     if (i > 0) {
                         remove_header(sProjectDirectory + sOutputFile + std::to_string(i) + "_1.sam");
@@ -184,10 +168,11 @@ int startExecutables(int reads_file_index){
                     cout << command << endl;
                     system(command.c_str());
                 } 
+                */
             } else {
                 run_full_align(0, sReferenceFile, sReadsFile, sOutputFile);
             }
-            sReadsFile = confDB.getKey("readsFile").stringVal; // the name of the reads file
+            //sReadsFile = confDB.getKey("readsFile").stringVal; // the name of the reads file
 
             /* Debugging */
             //std::exit(EXIT_SUCCESS);
@@ -199,13 +184,12 @@ int startExecutables(int reads_file_index){
         // Then we get unaligned reads (flag of 0x4, 0x16)
         if (confDB.getKey("extractUnalignedReads").boolVal == true && confDB.getKey("bamFile").boolVal == false){
 
-            /*
+            cout << "running getReads()" << endl;
             if (NUM_THREADS > 1) {
                 cout << "Making threads" << endl;
                 std::vector<std::thread> t;
                 cout << "running run_get_reads()" << endl;
                 for (unsigned int i = 0; i < NUM_THREADS; ++i) {
-                    sReadsFile = sReadsFile_v[i];
                     std::string str_i = std::to_string(i);
                     t.push_back(thread(run_get_reads, i, (sUnalignedFile + "_1"), (sOutputFile + str_i + "_1.sam"), "-f 4", "", true));
                 } 
@@ -219,10 +203,10 @@ int startExecutables(int reads_file_index){
             } else {
                 run_full_align(0, sReferenceFile, sReadsFile, sOutputFile);
             }
-            cout << "running getReads()" << endl;
-            */
+            /*
             if (getReads((sUnalignedFile + "_1"), (sOutputFile + "_1.sam"), "-f 4", "", true) != 0)
                 cout << "getReads 1 exited incorrectly" << endl;
+            */
 
         } else if (confDB.getKey("extractUnalignedReads").boolVal == true && confDB.getKey("bamFile").boolVal == true){
 
@@ -234,14 +218,35 @@ int startExecutables(int reads_file_index){
         if (confDB.getKey("extractUnalignedReads").boolVal == true){
 
             cout << "running convertSAMtoFASTA()" << endl;
+            if (NUM_THREADS > 1) {
+                cout << "Making threads" << endl;
+                std::vector<std::thread> t;
+                cout << "running run_convertSAMtoFASTA()" << endl;
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
+                    std::string str_i = std::to_string(i);
+                    t.push_back(thread(run_convertSAMtoFASTA, sUnalignedFile + std::to_string(i) + "_1"));
+                } 
+
+                // join threads here
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
+                    t[i].join();
+                } 
+                cout << "Threads rejoined" << endl;
+
+            } else {
+                run_convertSAMtoFASTA(sUnalignedFile + "_1");
+            }
+            /*
+            cout << "running convertSAMtoFASTA()" << endl;
             // Next we take the unaligned reads SAM file and create a FASTA file
             if (convertSAMtoFASTA(sUnalignedFile + "_1") != 0)
                 cout << "convertSAMtoFASTA 1 exited incorrectly" << endl;
+            */
         }
 
         if (confDB.getKey("halfAlign").boolVal == true){
 
-            cout << "running executeBwaAligner()" << endl;
+            cout << "running executeBwaAligner() halfAlign" << endl;
             // Now rerun the BWA aligner with the new unaligned reads file
             if (executeBwaAligner(sReferenceFile,(sUnalignedFile + "_1.fasta"), (sOutputFile + "_2")) != 0)
             cout << "BWA aligner 2 exited incorrectly" << endl;
@@ -252,7 +257,7 @@ int startExecutables(int reads_file_index){
             //[>if (getReads((sUnalignedFile + "_2"), (sOutputFile + "_2.sam"), "-f 4", "-f 16", false) != 0)
                 //cout << "getReads 2 exited incorrectly" << endl;
 
-            cout << "running getReads()" << endl;
+            cout << "running getReads() extractHalfReads" << endl;
             if (getReads((sUnalignedFile + "_2"), (sOutputFile + "_2.sam"), "-f 4", "", false) != 0)
                 cout << "getReads 2 exited incorrectly" << endl;
         }
