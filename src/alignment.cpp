@@ -21,9 +21,9 @@ using namespace std;
 //double delta = confDB.getKey("delta").doubleVal;
 double mu = 0.0;
 double delta = 0.0;
-int arrIPath[1000][1000]; // the backtrack path for i
-int arrJPath[1000][1000]; // the backtrack path for j
-double matrix[1000][1000];
+//int arrIPath[1000][1000]; // the backtrack path for i
+//int arrJPath[1000][1000]; // the backtrack path for j
+//double matrix[1000][1000];
 
 
 /*
@@ -35,6 +35,11 @@ double matrix[1000][1000];
  */
 t_alignment_struct getLocalAlignment(string seq1, string seq2, double m, double d){
 	//cout << seq1.length() << ", " << seq2.length() << endl;
+
+    std::vector<std::vector<int>> arrIPath(1000, std::vector<int>(1000, 0));
+    std::vector<std::vector<int>> arrJPath(1000, std::vector<int>(1000, 0));
+    std::vector<std::vector<double>> matrix(1000, std::vector<double>(1000, 0));
+
 	mu = m;
 	delta = d;
 	t_alignment_struct tReturn;
@@ -46,17 +51,20 @@ t_alignment_struct getLocalAlignment(string seq1, string seq2, double m, double 
 	int iCase = 0;
 	int iLengthS1 = seq1.length();
 	int iLengthS2 = seq2.length();
+
 	/*static int arrIPath[seq1.length() + 1][seq2.length() + 1]; // the backtrack path for i
 	static int arrJPath[seq1.length() + 1][seq2.length() + 1]; // the backtrack path for j
 	static double matrix[seq1.length() + 1][seq2.length() + 1];
 	*/
 
 	// initialize matrix to 0s
+    /*
 	for (int i = 0; i <= iLengthS1; ++i){
 		for (int j = 0; j <= iLengthS2; ++j){
 			matrix[i][j] = 0;
 		}
 	}
+    */
 	for (int i = 0; i < 4; ++i)
 		temp[i] = 0;
 
@@ -65,28 +73,41 @@ t_alignment_struct getLocalAlignment(string seq1, string seq2, double m, double 
 	for (int i = 1; i < iLengthS1; ++i){
 		for (int j = 1; j < iLengthS2; ++j){
 			// store the 4 possible values for a local alignment
+            /*
 			temp[0] = matrix[i-1][j-1] + getSimilarityScore(seq1[i-1], seq2[j-1]); // diagonal
 			temp[1] = matrix[i-1][j] - delta; // directly above
 			temp[2] = matrix[i][j-1] - delta; // to the left
+            */
+
+			temp[0] = matrix.at(i-1).at(j-1) + getSimilarityScore(seq1[i-1], seq2[j-1]); // diagonal
+			temp[1] = matrix.at(i-1).at(j) - delta; // directly above
+			temp[2] = matrix.at(i).at(j-1) - delta; // to the left
+
 			temp[3] = 0; // 0
 			iCase = getMaxArrayValue(temp, 4);
-			matrix[i][j] = temp[iCase];
+			matrix.at(i).at(j) = temp[iCase];
 			switch(iCase){
 			case 0: // a match or mismatch (diagonal)
-				arrIPath[i][j] = i-1;
-				arrJPath[i][j] = j-1;
+				arrIPath.at(i).at(j) = i-1;
+				arrJPath.at(i).at(j) = j-1;
 				break;
 			case 1: // a deletion in sequence 1
-				arrIPath[i][j] = i-1;
-				arrJPath[i][j] = j;
+				//arrIPath[i][j] = i-1;
+				//arrJPath[i][j] = j;
+				arrIPath.at(i).at(j) = i-1;
+				arrJPath.at(i).at(j) = j;
 				break;
 			case 2: // a deletion in sequence 2
-				arrIPath[i][j] = i;
-				arrJPath[i][j] = j-1;
+				//arrIPath[i][j] = i;
+				//arrJPath[i][j] = j-1;
+				arrIPath.at(i).at(j) = i;
+				arrJPath.at(i).at(j) = j - 1;
 				break;
 			case 3: // (i,j) is the beginning of a sequence (or subsequence)
-				arrIPath[i][j] = i;
-				arrJPath[i][j] = j;
+				//arrIPath[i][j] = i;
+				//arrJPath[i][j] = j;
+				arrIPath.at(i).at(j) = i;
+				arrJPath.at(i).at(j) = j;
 				break;
 			}
 		}
@@ -99,8 +120,8 @@ t_alignment_struct getLocalAlignment(string seq1, string seq2, double m, double 
 	int iMaxCoordJ = 0; // j coordinate of maximum value
 	for (int i = 1; i < iLengthS1; ++i){
 		for (int j = 1; j < iLengthS2; ++j){
-			if (matrix[i][j] > dMax){
-				dMax = matrix[i][j];
+			if (matrix.at(i).at(j) > dMax){
+				dMax = matrix.at(i).at(j);
 				iMaxCoordI = i;
 				iMaxCoordJ = j;
 			}
@@ -111,8 +132,10 @@ t_alignment_struct getLocalAlignment(string seq1, string seq2, double m, double 
 	// Let's backtrack from that maximum value until we get to 0 (as per a local alignment)
 	int iCurrentI = iMaxCoordI;
 	int iCurrentJ = iMaxCoordJ;
-	int iNextI = arrIPath[iCurrentI][iCurrentJ]; // the next i value to take
-	int iNextJ = arrJPath[iCurrentI][iCurrentJ];
+	//int iNextI = arrIPath[iCurrentI][iCurrentJ]; // the next i value to take
+	//int iNextJ = arrJPath[iCurrentI][iCurrentJ];
+	int iNextI = arrIPath.at(iCurrentI).at(iCurrentJ); // the next i value to take
+	int iNextJ = arrJPath.at(iCurrentI).at(iCurrentJ);
 
 	while (((iCurrentI != iNextI) || (iCurrentJ != iNextJ)) && (iNextI != 0) && (iNextJ != 0)){
 		if (iNextI == iCurrentI) // A deletion in seq A (the template)
@@ -127,8 +150,8 @@ t_alignment_struct getLocalAlignment(string seq1, string seq2, double m, double 
 
 		iCurrentI = iNextI;
 		iCurrentJ = iNextJ;
-		iNextI = arrIPath[iCurrentI][iCurrentJ];
-		iNextJ = arrJPath[iCurrentI][iCurrentJ];
+		iNextI = arrIPath.at(iCurrentI).at(iCurrentJ);
+		iNextJ = arrJPath.at(iCurrentI).at(iCurrentJ);
 	}
 
 	sTemplate = seq1[iCurrentI - 1] + sTemplate;
@@ -158,7 +181,8 @@ t_alignment_struct getGlobalAlignment(string &seq1, string &seq2, double m, doub
 	delta = d;
 	string sBIR;
 	string sTemplate;
-	double matrix[seq1.length()+1][seq2.length()+1];
+	//double matrix[seq1.length()+1][seq2.length()+1];
+    std::vector<std::vector<double>> matrix(seq1.length()+1, std::vector<double>(seq2.length()+1 , 0));
 	double temp[3]; // ******* CHANGE TO 4 FOR LOCAL ALIGNEMNT
 	int iCase;
 	int iLengthS1 = seq1.length();
@@ -168,11 +192,13 @@ t_alignment_struct getGlobalAlignment(string &seq1, string &seq2, double m, doub
 
 
 	// initialize matrix to 0s
+    /*
 	for (int i = 0; i <= iLengthS1; ++i){
 		for (int j = 0; j < iLengthS2; ++j){
 			matrix[i][j] = 0;
 		}
 	}
+    */
 
 	for (int i = 0; i <= iLengthS1; ++i)
 		matrix[i][0] = delta*i;

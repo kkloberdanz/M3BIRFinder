@@ -67,39 +67,8 @@ int main(int argc, char *argv[]) {
     start_time = clock();
     // execute the main alignment programs (BWA and samtools)
     
-    /* Changes start here */
-
-    // run this over several threads
-    /*
-    const int NUM_THREADS = sReadsFile_v.size();
-    */
-    //bir::BWA bwa_align;
-    //bwa_align.startExecutables(0);
     startExecutables(1);
 
-    /*
-    cout << "Making threads" << endl;
-    thread t[NUM_THREADS];
-    for (int i = 0; i < NUM_THREADS; ++i) {
-        t[i] = thread(test_threads, i);
-    }
-
-    //int exec = startExecutables();
-
-    // join threads here
-    for (int i = 0; i < NUM_THREADS; ++i) {
-        t[i].join();
-    } 
-    cout << "Threads rejoined" << endl;
-    */
-
-    /*
-    if (exec != 0)
-        cout << "Exec exited with: " << exec << endl;
-    cout << "COMPLETED: startExecutables(): " << get_end_time_ms(start_time) << "ms" << endl;
-    */
-
-    /* Changes end here */
 
     start_time = clock();
     // read in reference genome

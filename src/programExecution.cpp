@@ -26,9 +26,12 @@ std::mutex mtx;
 
 std::vector<std::string> sReadsFile_v;
 
-void build_reads_sReadsFile_v() {
+void build_reads_sReadsFile_v(std::string sReadsFile) {
+    size_t lastindex = sReadsFile.find_last_of("."); 
+    std::string without_extension = sReadsFile.substr(0, lastindex); 
     for (unsigned int i = 0; i < NUM_THREADS; ++i) {
-        sReadsFile_v.push_back("ALM29_ACTGAT_L008_R1_001.part_" + std::to_string(i) + ".fastq");
+        sReadsFile_v.push_back(without_extension + ".part_" + std::to_string(i) + ".fastq");
+        std::cout << "Pushed: " << without_extension + ".part_" + std::to_string(i) + ".fastq" << std::endl;
     }
 }
 
@@ -48,8 +51,16 @@ void run_full_align(unsigned int threadnum, std::string sReferenceFile, std::str
         cout << "BWA aligner 1 exited incorrectly" << endl;
 }
 
-void run_convertSAMtoFASTA(std::string sUnalignedFile) {
+void run_convertSAMtoFASTA(unsigned int threadnum, std::string sUnalignedFile) {
     convertSAMtoFASTA(sUnalignedFile);
+}
+
+void run_filterOut(unsigned int threadnum, std::string sOutputFile, std::string sInputFile, std::string sFlag1, std::string sFlag2) {
+    filterOut(sOutputFile, sInputFile, sFlag1, sFlag2);
+}
+
+void run_executeBwaAligner(unsigned int threadnum, std::string sReferenceFile, std::string sUnalignedFile, std::string sOutputFile) {
+    executeBwaAligner(sReferenceFile,(sUnalignedFile), (sOutputFile));
 }
 
 void remove_header(std::string filename) {
@@ -100,8 +111,21 @@ void run_get_reads(unsigned int threadnum,
         cout << "getReads 1 exited incorrectly" << endl;
 }
 
+void concatenate_to_file(std::vector<std::string> input_v, std::string output_filename) {
+    std::string command = "rm -f " + output_filename;
+    system(command.c_str());
+    for (size_t i = 0; i < input_v.size(); ++i) { 
+
+        if (i > 0) {
+            remove_header(input_v.at(i));
+        }
+        std::string command = "cat " + input_v.at(i) + " >> " + output_filename;
+        cout << command << endl;
+        system(command.c_str());
+    } 
+}
+
 int startExecutables(int reads_file_index){
-    build_reads_sReadsFile_v();
 
     cout << "Launched from thread: " << reads_file_index << endl;
     //string sReadsFile = sReadsFile_v[reads_file_index];
@@ -112,6 +136,9 @@ int startExecutables(int reads_file_index){
 
 
     string sReadsFile = confDB.getKey("readsFile").stringVal; // the name of the reads file
+
+    std::cout << "Building vector using: " << sReadsFile << std::endl;
+    build_reads_sReadsFile_v(sReadsFile);
 
     string sUnalignedFile = confDB.getKey("unalignedFile").stringVal; // the name of the unaligned FASTA/SAM file
     string sOutputFile = confDB.getKey("outputFile").stringVal; // name of the output file from BWA aligner
@@ -152,12 +179,13 @@ int startExecutables(int reads_file_index){
                 cout << "Threads rejoined" << endl;
 
                 /*
-                // concatenate outputx_1 files into 1 file
                 cout << "Concatenating output files back into one file" << endl; 
+
                 {
                 std::string command = "rm -f " + sProjectDirectory + sOutputFile + "_1.sam";
                 system(command.c_str());
                 } 
+
                 for (unsigned int i = 0; i < NUM_THREADS; ++i) {
                     if (i > 0) {
                         remove_header(sProjectDirectory + sOutputFile + std::to_string(i) + "_1.sam");
@@ -172,7 +200,8 @@ int startExecutables(int reads_file_index){
             } else {
                 run_full_align(0, sReferenceFile, sReadsFile, sOutputFile);
             }
-            //sReadsFile = confDB.getKey("readsFile").stringVal; // the name of the reads file
+            sReadsFile = confDB.getKey("readsFile").stringVal; // the name of the reads file
+
 
             /* Debugging */
             //std::exit(EXIT_SUCCESS);
@@ -191,7 +220,7 @@ int startExecutables(int reads_file_index){
                 cout << "running run_get_reads()" << endl;
                 for (unsigned int i = 0; i < NUM_THREADS; ++i) {
                     std::string str_i = std::to_string(i);
-                    t.push_back(thread(run_get_reads, i, (sUnalignedFile + "_1"), (sOutputFile + str_i + "_1.sam"), "-f 4", "", true));
+                    t.push_back(thread(run_get_reads, i, (sUnalignedFile + str_i + "_1"), (sOutputFile + str_i + "_1.sam"), "-f 4", "", true));
                 } 
 
                 // join threads here
@@ -204,27 +233,22 @@ int startExecutables(int reads_file_index){
                 run_full_align(0, sReferenceFile, sReadsFile, sOutputFile);
             }
             /*
+            cout << "running getReads()" << endl;
             if (getReads((sUnalignedFile + "_1"), (sOutputFile + "_1.sam"), "-f 4", "", true) != 0)
                 cout << "getReads 1 exited incorrectly" << endl;
             */
 
         } else if (confDB.getKey("extractUnalignedReads").boolVal == true && confDB.getKey("bamFile").boolVal == true){
 
+
             cout << "running getReads()" << endl;
-            if (getReads((sUnalignedFile + "_1"), (sAlignedFile), "-f 4", "", true) != 0)
-                cout << "getReads 1 exited incorrectly" << endl;
-        }
-
-        if (confDB.getKey("extractUnalignedReads").boolVal == true){
-
-            cout << "running convertSAMtoFASTA()" << endl;
             if (NUM_THREADS > 1) {
                 cout << "Making threads" << endl;
                 std::vector<std::thread> t;
-                cout << "running run_convertSAMtoFASTA()" << endl;
+                cout << "running run_get_reads()" << endl;
                 for (unsigned int i = 0; i < NUM_THREADS; ++i) {
                     std::string str_i = std::to_string(i);
-                    t.push_back(thread(run_convertSAMtoFASTA, sUnalignedFile + std::to_string(i) + "_1"));
+                    t.push_back(thread(run_get_reads, i, (sUnalignedFile + str_i + "_1"), (sAlignedFile + str_i), "-f 4", "", true));
                 } 
 
                 // join threads here
@@ -234,8 +258,40 @@ int startExecutables(int reads_file_index){
                 cout << "Threads rejoined" << endl;
 
             } else {
-                run_convertSAMtoFASTA(sUnalignedFile + "_1");
+                exit(EXIT_FAILURE);
+                run_full_align(0, sReferenceFile, sReadsFile, sOutputFile);
             }
+
+            /*
+            cout << "running getReads()" << endl;
+            if (getReads((sUnalignedFile + "_1"), (sAlignedFile), "-f 4", "", true) != 0)
+                cout << "getReads 1 exited incorrectly" << endl;
+            */
+        }
+
+        if (confDB.getKey("extractUnalignedReads").boolVal == true){
+
+            cout << "running convertSAMtoFASTA()" << endl;
+            if (NUM_THREADS > 1) {
+                cout << "Making threads" << endl;
+                std::vector<std::thread> t;
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
+                    std::string str_i = std::to_string(i);
+                    //t.push_back(thread(run_get_reads, i, (sUnalignedFile + "_1"), (sAlignedFile + str_i), "-f 4", "", true));
+                    t.push_back(thread(run_convertSAMtoFASTA, i, (sUnalignedFile + str_i + "_1")));
+                } 
+
+                // join threads here
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
+                    t[i].join();
+                } 
+                cout << "Threads rejoined" << endl;
+
+            } else {
+                exit(EXIT_FAILURE);
+                run_full_align(0, sReferenceFile, sReadsFile, sOutputFile);
+            }
+
             /*
             cout << "running convertSAMtoFASTA()" << endl;
             // Next we take the unaligned reads SAM file and create a FASTA file
@@ -246,10 +302,33 @@ int startExecutables(int reads_file_index){
 
         if (confDB.getKey("halfAlign").boolVal == true){
 
-            cout << "running executeBwaAligner() halfAlign" << endl;
+            cout << "running executeBwaAligner()" << endl;
+            if (NUM_THREADS > 1) {
+                cout << "Making threads" << endl;
+                std::vector<std::thread> t;
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
+                    std::string str_i = std::to_string(i);
+                    //t.push_back(thread(run_get_reads, i, (sUnalignedFile + "_1"), (sAlignedFile + str_i), "-f 4", "", true));
+                    t.push_back(thread(run_executeBwaAligner, i, sReferenceFile,(sUnalignedFile + str_i + "_1.fasta"), (sOutputFile + str_i + "_2")));
+
+                } 
+
+                // join threads here
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
+                    t[i].join();
+                } 
+                cout << "Threads rejoined" << endl;
+
+            } else {
+                exit(EXIT_FAILURE);
+            }
+
+            /*
+            cout << "running executeBwaAligner()" << endl;
             // Now rerun the BWA aligner with the new unaligned reads file
             if (executeBwaAligner(sReferenceFile,(sUnalignedFile + "_1.fasta"), (sOutputFile + "_2")) != 0)
             cout << "BWA aligner 2 exited incorrectly" << endl;
+            */
         }
 
         if (confDB.getKey("extractHalfReads").boolVal == true){
@@ -257,18 +336,64 @@ int startExecutables(int reads_file_index){
             //[>if (getReads((sUnalignedFile + "_2"), (sOutputFile + "_2.sam"), "-f 4", "-f 16", false) != 0)
                 //cout << "getReads 2 exited incorrectly" << endl;
 
-            cout << "running getReads() extractHalfReads" << endl;
+            cout << "running getReads()" << endl;
+            if (NUM_THREADS > 1) {
+                cout << "Making threads" << endl;
+                std::vector<std::thread> t;
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
+                    std::string str_i = std::to_string(i);
+                    t.push_back(thread(run_get_reads, i, (sUnalignedFile + str_i + "_2"), (sOutputFile + str_i + "_2.sam"), "-f 4", "", false));
+
+                } 
+
+                // join threads here
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
+                    t[i].join();
+                } 
+                cout << "Threads rejoined" << endl;
+
+            } else {
+                exit(EXIT_FAILURE);
+            }
+
+            /*
+            cout << "running getReads()" << endl;
             if (getReads((sUnalignedFile + "_2"), (sOutputFile + "_2.sam"), "-f 4", "", false) != 0)
                 cout << "getReads 2 exited incorrectly" << endl;
+            */
         }
 
         if (confDB.getKey("filterOut").boolVal == true){
             // Finally lets take the new BWA SAM file and use samtools to find the matches (flag 0x0)
             //[>if (filterOut(("bwaAligned"), (sOutputFile + "_2"), "-F 4", "-F 16") != 0)
                 cout << "getReads 3 exited incorrectly" << endl;
+
+
+            cout << "running filterOut()" << endl;
+            if (NUM_THREADS > 1) {
+                cout << "Making threads" << endl;
+                std::vector<std::thread> t;
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
+                    std::string str_i = std::to_string(i);
+                    t.push_back(thread(run_filterOut, i, (sFinalAlignedFile + str_i), (sOutputFile + str_i + "_2"), "-F 4", ""));
+
+                } 
+
+                // join threads here
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
+                    t[i].join();
+                } 
+                cout << "Threads rejoined" << endl;
+
+            } else {
+                exit(EXIT_FAILURE);
+            }
+
+            /*
             cout << "running filterOut()" << endl;
             if (filterOut((sFinalAlignedFile), (sOutputFile + "_2"), "-F 4", "") != 0)
                 cout << "getReads 3 exited incorrectly" << endl;
+            */
         }
 
     }
@@ -276,9 +401,37 @@ int startExecutables(int reads_file_index){
     cout << "\nBWA time = " << (int)time(NULL)-time0 << endl;
     fLogFileOut << "\nBWA time = " << (int)time(NULL)-time0 << endl;
 
+    std::cout << "startExecutables finished" << std::endl; 
+    std::cout << "Concatenating temp files" << std::endl;
+
+
+    // bwaOutput*_1.sam
+    std::vector<std::string> bwaOutput_1_input_v;
+    std::vector<std::string> bwaOutput_2_input_v;
+    std::vector<std::string> unaligned_1_sam_input_v;
+    std::vector<std::string> unaligned_2_sam_input_v;
+    std::vector<std::string> unaligned_1_fasta_input_v;
+    std::vector<std::string> bwaAligned_input_v;
+
+    for (size_t i = 0; i < NUM_THREADS; ++i) {
+        bwaOutput_1_input_v.push_back(sProjectDirectory + sOutputFile + std::to_string(i) + "_1.sam");
+        bwaOutput_2_input_v.push_back(sProjectDirectory + sOutputFile + std::to_string(i) + "_2.sam");
+        unaligned_1_sam_input_v.push_back(sProjectDirectory + sUnalignedFile + std::to_string(i) + "_1.sam");
+        unaligned_1_fasta_input_v.push_back(sProjectDirectory + sUnalignedFile + std::to_string(i) + "_1.fasta");
+        unaligned_2_sam_input_v.push_back(sProjectDirectory + sUnalignedFile + std::to_string(i) + "_2.sam");
+        bwaAligned_input_v.push_back(sProjectDirectory + "bwaAligned" + std::to_string(i) + ".sam");
+    }
+    //concatenate_to_file(bwaOutput_1_input_v, sProjectDirectory + sOutputFile + "_1.sam");
+    concatenate_to_file(bwaOutput_2_input_v, sProjectDirectory + sOutputFile + "_2.sam"); 
+    concatenate_to_file(unaligned_1_sam_input_v, sProjectDirectory + sUnalignedFile + "_1.sam"); 
+    concatenate_to_file(unaligned_1_fasta_input_v, sProjectDirectory + sUnalignedFile + "_1.fasta");
+    concatenate_to_file(unaligned_2_sam_input_v, sProjectDirectory + sUnalignedFile + "_2.sam");
+    concatenate_to_file(bwaAligned_input_v, sProjectDirectory + "bwaAligned.sam");
+
     if (confDB.getKey("onlyAlign").boolVal == true)
         exit(1);
 
+    //exit(EXIT_SUCCESS);
     return 0;
 }
 
@@ -348,6 +501,8 @@ int getReads(string sUnalignedFile, string sBwaOutputFile, string sFlag1, string
         // run samtools to get unaligned reads
         cout << "\nget samtools reads with flag " + sFlag1 + " into " << sProjectDirectory + sUnalignedFile << "_flag_1..." << endl;
         fLogFileOut << "\nget samtools reads with flag " + sFlag1 + " into " << sProjectDirectory + sUnalignedFile << "_flag_1..." << endl;
+
+        std::cout << "Running: " << command << std::endl;
         system(command.c_str());
 
         if (sFlag2.compare("") != 0){
@@ -379,6 +534,7 @@ int getReads(string sUnalignedFile, string sBwaOutputFile, string sFlag1, string
             system(command.c_str());
         }
     }
+
     return 0;
 }
 

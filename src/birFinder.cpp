@@ -66,8 +66,15 @@ int createSplitReadDatabase(string sAlignedFilename){
 
 	// Read in the aligned SAM file and create a database of anchored half reads and their locations
 	// We are treating these as candidate reads
+    std::cout << "Opening: " << sProjectDirectory + sAlignedFilename << std::endl;
 	input.open((sProjectDirectory + sAlignedFilename).c_str());
+    if (!input.is_open()) {
+        std::cout << "Could not open file: '" << sProjectDirectory + sAlignedFilename << "'" << std::endl;
+    }
+
 	for (string row; getline(input, row, row_delim);){
+
+
 		++index;
 		if (index % 10000000 == 0)
 			cout << "half-read: " << index << endl;
@@ -78,18 +85,19 @@ int createSplitReadDatabase(string sAlignedFilename){
 		for(string word; getline(ss, word, field_delim);)
 			curr.push_back(word);
 
-		if (row[0]=='@' && row[1]=='S' && row[2]=='Q'){
+
+		if ((row.size() > 2) && row[0]=='@' && row[1]=='S' && row[2]=='Q'){
 			// Get the header information
-			vReferenceGenome[iChr].samHeader = curr[1].substr(3);
+			vReferenceGenome.at(iChr).samHeader = curr.at(1).substr(3);
 			++iChr;
-		} else if (row[0]!='@') {
+		} else if ((row.size() > 0) && (row[0]!='@')) {
 			// We store the read name as the key and the position, length, and sequence as the elements in a struct
-			sReadName = curr[0];
-			frag.sReadName = curr[0];
-			frag.iParentStart = atoi(curr[3].c_str());
-			frag.sParentRead = curr[9];
+			sReadName = curr.at(0);
+			frag.sReadName = curr.at(0);
+			frag.iParentStart = atoi(curr.at(3).c_str());
+			frag.sParentRead = curr.at(9);
 			frag.iParentEnd = frag.iParentStart + frag.sParentRead.length() - 1;
-			frag.iFlag = atoi(curr[1].c_str());
+			frag.iFlag = atoi(curr.at(1).c_str());
 
 			if (sReadName[sReadName.length()-1] == '1'){ // the first half is anchored
 				frag.bAnchorLeft = true;
@@ -102,9 +110,9 @@ int createSplitReadDatabase(string sAlignedFilename){
 
 			for (unsigned int i = 0; i < vReferenceGenome.size(); ++i){
 				//cout << curr[2] << " ?= " << vReferenceGenome[i].fastaHeader << endl;
-				if (curr[2].find(vReferenceGenome[i].fastaHeader) != string::npos)
+				if (curr.at(2).find(vReferenceGenome.at(i).fastaHeader) != string::npos)
 					frag.iChromosome = i;
-				else if (vReferenceGenome[i].fastaHeader.find(curr[2]) != string::npos) // TODO find better way of searching for fasta header
+				else if (vReferenceGenome.at(i).fastaHeader.find(curr.at(2)) != string::npos) // TODO find better way of searching for fasta header
 					frag.iChromosome = i;
 			}
 
