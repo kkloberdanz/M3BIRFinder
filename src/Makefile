@@ -26,7 +26,7 @@ $(BUILD_DIR)/templateFinder.o: templateFinder.cpp defs.h
 $(BUILD_DIR)/birAligner.o: birAligner.cpp defs.h
 	$(C++) $(CFLAGS) -o $(BUILD_DIR)/birAligner.o -c birAligner.cpp 
 
-$(BUILD_DIR)/birConsolidate.o:
+$(BUILD_DIR)/birConsolidate.o: birConsolidate.cpp
 	$(C++) $(CFLAGS) -o $(BUILD_DIR)/birConsolidate.o -c birConsolidate.cpp 
 
 $(BUILD_DIR)/printOptions.o: printOptions.cpp defs.h

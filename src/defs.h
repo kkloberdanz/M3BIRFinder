@@ -44,6 +44,7 @@ struct t_consolidated{
     bool bBadRead;
 };
 
+
 struct t_alignment_struct{
     int iEndPosI;
     int iStartPosI;
@@ -66,6 +67,7 @@ string sJobId;
 string sBaseFileName;
 string sProjectDirectory;
 ofstream fLogFileOut;
+size_t num_candidate_reads;
 
 #else
 extern ConfigDB confDB;
@@ -79,6 +81,7 @@ extern string sJobId;
 extern string sBaseFileName;
 extern string sProjectDirectory;
 extern ofstream fLogFileOut;
+extern size_t num_candidate_reads;
 
 #endif /* MAIN_CPP_ */
 

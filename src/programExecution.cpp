@@ -122,6 +122,8 @@ void concatenate_to_file(std::vector<std::string> input_v, std::string output_fi
         std::string command = "cat " + input_v.at(i) + " >> " + output_filename;
         cout << command << endl;
         system(command.c_str());
+        command = "rm -f " + input_v.at(i);
+        system(command.c_str());
     } 
 }
 

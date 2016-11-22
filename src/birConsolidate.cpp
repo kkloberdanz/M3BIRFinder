@@ -7,6 +7,7 @@
 
 
 #include "defs.h"
+#include "CSVRow.hpp"
 
 #include <iostream>
 #include <stdlib.h>
@@ -23,6 +24,47 @@
 
 using namespace std;
 
+std::string remove_char(std::string s, char bad_c) {
+    std::string ret_s;
+    for (const char& c : s) {
+        if (c != bad_c) {
+            ret_s += c;
+        }
+    }
+    return ret_s;
+}
+
+template <typename T>
+void print_vector(std::vector<T> v) {
+    std::cout << "[";
+    for (size_t i = 0; i < v.size() - 1; ++i) { 
+        std::cout << v.at(i) << ", ";
+    }
+    std::cout << v.back() << "]" << std::endl;
+}
+
+void print_t_consolidated(t_consolidated f) {
+    std::cout << "----------------------" << std::endl;
+    std::cout << f.sReadName << std::endl;
+    std::cout << f.sParentRead << std::endl;
+    std::cout << f.iParentStart << std::endl;
+    std::cout << f.iParentEnd << std::endl;
+    std::cout << f.iBirStart << std::endl;
+    std::cout << f.iBirEnd << std::endl;
+    std::cout << f.sBir << std::endl;
+    std::cout << f.iBirLength << std::endl;
+    std::cout << f.iTemplateStart << std::endl;
+    std::cout << f.iTemplateEnd << std::endl;
+    std::cout << f.sTemplate << std::endl;
+    std::cout << f.iTemplateLength << std::endl;
+    std::cout << f.bBirCandidateFound << std::endl;
+    std::cout << f.iChromosome << std::endl;
+    std::cout << f.bAnchorLeft << std::endl;
+    std::cout << f.iFlag << std::endl;
+    std::cout << f.bBadRead << std::endl; 
+    std::cout << "----------------------" << std::endl;
+}
+
 // birConsolidate
 int startConsolidate(){
     cout << "\nstartConsolidate start..." << endl;
@@ -34,10 +76,13 @@ int startConsolidate(){
         cout << "start candidate read sorting..." << endl;
         fLogFileOut << "start candidate read sorting..." << endl;
         // sort the parent starting locations for each chromosome from smallest to largest
-        sort(vCandidateReads.begin(), vCandidateReads.end(), compareStart);
+        //sort(vCandidateReads.begin(), vCandidateReads.end(), compareStart);
 
-        fLogFileOut << "Before consolidation: " << vCandidateReads.size() << endl;
+        //fLogFileOut << "Before consolidation: " << vCandidateReads.size() << endl;
+        fLogFileOut << "Before consolidation: " << num_candidate_reads << endl;
         cout << "Printing unconsolidated_bir_locations.txt..." << endl;
+
+        /*
         output.open((sProjectDirectory + "unconsolidated_bir_locations.txt").c_str());
         for (unsigned int i = 0; i < vCandidateReads.size(); ++i){
             if (vCandidateReads[i].bBadRead)
@@ -45,6 +90,8 @@ int startConsolidate(){
             output << vCandidateReads[i].iChromosome << ", " << vCandidateReads[i].iParentStart << "," << vCandidateReads[i].iParentEnd << endl;
         }
         output.close();
+        */
+
 
         // Finally, let's consolidated the possible BIR locations to speed up the alignment steps. This is based on overlapping regions
         consolidateLocations();
@@ -119,17 +166,61 @@ void consolidateLocations(){
     bool first = true;
     int iChr = (confDB.getKey("chromosome").intVal == 0 ? 0 : confDB.getKey("chromosome").intVal - 1); // get the user specified chromoome
     bool bOnlyOneChr = (confDB.getKey("chromosome").intVal != 0 ? true :false);
-    int sizeCan = vCandidateReads.size();
+    //int sizeCan = vCandidateReads.size();
+    int sizeCan = num_candidate_reads;
+    std::cout << "sizeCan: " << sizeCan << std::endl;
     int fivePercent = sizeCan / 20;
     string sHalfReadClusters = confDB.getKey("clusterFile").stringVal;
 
     cout << "Chromsome: " << iChr << endl;
-    for (int i = 0; i < sizeCan; ++i){
+
+    std::string CandidateReads_filename;
+    CandidateReads_filename = sProjectDirectory + "CandidateReads.csv";
+    std::ifstream candidate_reads_file;
+	candidate_reads_file.open(CandidateReads_filename); 
+
+    CSVRow row;
+    std::vector<std::string> row_v;
+    t_consolidated frag;
+
+    size_t i = 0;
+    while (candidate_reads_file >> row) {
+
+        //row.print();
+
+        //std::cout << "Itteration: " << i << std::endl;
+
+        for (size_t j = 0; j < row.size(); ++j) {
+            row_v.push_back(remove_char(row[j], ' '));
+        }
+
+        //print_vector(row_v);
+
+        frag.sReadName            = row_v[3];
+        frag.sParentRead          = row_v[4];
+        frag.iParentStart         = atoi(row_v[1].c_str());
+        frag.iParentEnd           = atoi(row_v[2].c_str());
+        frag.iBirStart            = atoi(row_v[5].c_str());
+        frag.iBirEnd              = atoi(row_v[6].c_str());
+        frag.sBir                 = row_v[7];
+        frag.iBirLength           = atoi(row_v[8].c_str());
+        frag.iTemplateStart       = atoi(row_v[9].c_str());
+        frag.iTemplateEnd         = atoi(row_v[10].c_str());
+        frag.sTemplate            = row_v[11];
+        frag.iTemplateLength      = atoi(row_v[12].c_str());
+        frag.bBirCandidateFound   = atoi(row_v[13].c_str()) != 0;
+        frag.iChromosome          = atoi(row_v[0].c_str());
+        frag.bAnchorLeft          = atoi(row_v[14].c_str()) != 0;
+        frag.iFlag                = atoi(row_v[15].c_str());
+        frag.bBadRead             = atoi(row_v[16].c_str()) != 0;
+
+        row_v.clear();
+
         if (i % fivePercent == 0)
             cout << "\tcandidateRead: " << i << " of " << sizeCan << " on chromosome " << iChr << " (" << ((i * 100) / sizeCan) << "%)" << endl;
-        if (vCandidateReads[i].iChromosome != iChr && vCandidateReads[i].iChromosome != iChr+1)
+        if (frag.iChromosome != iChr && frag.iChromosome != iChr+1)
             continue;
-        else if (vCandidateReads[i].iChromosome != iChr && vCandidateReads[i].iChromosome == iChr+1){
+        else if (frag.iChromosome != iChr && frag.iChromosome == iChr+1){
             if (bOnlyOneChr) // if the user only wants to cluster one chromosome, we break out here
                 break;
             ++iChr;
@@ -149,13 +240,13 @@ void consolidateLocations(){
         }
 
         if (first){
-            curr.push_back(vCandidateReads[i]);
+            curr.push_back(frag);
             first = false;
-            iLastEndLoc = vCandidateReads[i].iParentStart + vCandidateReads[i].sParentRead.length() - 1;
+            iLastEndLoc = frag.iParentStart + frag.sParentRead.length() - 1;
             continue;
         }
 
-        if (vCandidateReads[i].iParentStart > iLastEndLoc){
+        if (frag.iParentStart > iLastEndLoc){
             if (curr.size() >= iMinConsolidate && curr.size() <= 200){ // TODO make 200 a config variable
                 vConsolidated.push_back(curr);
                 iNumReads += curr.size();
@@ -163,13 +254,15 @@ void consolidateLocations(){
                 ++iSkippedCluster;
             }
             curr.clear();
-            curr.push_back(vCandidateReads[i]);
+            curr.push_back(frag);
         } else {
-            curr.push_back(vCandidateReads[i]);
+            curr.push_back(frag);
         }
-        iLastEndLoc = vCandidateReads[i].iParentStart + vCandidateReads[i].sParentRead.length() - 1;
+        iLastEndLoc = frag.iParentStart + frag.sParentRead.length() - 1;
 
+        i++;
     }
+    candidate_reads_file.close();
 
     fLogFileOut << "Number clusters skipped: " << iSkippedCluster << endl;
     cout << "\nNumber reads after consolidation: " << iNumReads << endl;
@@ -191,6 +284,12 @@ void consolidateLocations(){
         }
     }
     output.close();
+
+    { // Clean up Candidate Reads File
+        std::string command;
+        command = "rm -f " + sProjectDirectory + "CandidateReads.csv";
+        system(command.c_str());
+    }
 
     // print out the half-read clustered locations
     /*fLogFileOut << "Printing half_read_clustered_locations.txt" << endl;

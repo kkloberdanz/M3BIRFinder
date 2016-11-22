@@ -67,7 +67,8 @@ int main(int argc, char *argv[]) {
     start_time = clock();
     // execute the main alignment programs (BWA and samtools)
     
-    //startExecutables(1); 
+    startExecutables(1);
+
 
     start_time = clock();
     // read in reference genome
