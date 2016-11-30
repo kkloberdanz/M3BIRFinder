@@ -101,6 +101,7 @@ int startConsolidate(){
         if (confDB.getKey("mysql").boolVal){
             vCandidateReads.clear();
             vConsolidated.clear();
+            std::cout << "EXITING SUCCESS" << std::endl;
             exit(0);
         }
     }
@@ -181,86 +182,94 @@ void consolidateLocations(){
 
     CSVRow row;
     std::vector<std::string> row_v;
-    t_consolidated frag;
+    t_consolidated frag, prev;
 
-    size_t i = 0;
-    while (candidate_reads_file >> row) {
+    try {
+        for (size_t i = 0; candidate_reads_file >> row; ++i) {
 
-        //row.print();
+            //row.print();
 
-        //std::cout << "Itteration: " << i << std::endl;
+            //std::cout << "Itteration: " << i << std::endl;
 
-        for (size_t j = 0; j < row.size(); ++j) {
-            row_v.push_back(remove_char(row[j], ' '));
-        }
-
-        //print_vector(row_v);
-
-        frag.sReadName            = row_v[3];
-        frag.sParentRead          = row_v[4];
-        frag.iParentStart         = atoi(row_v[1].c_str());
-        frag.iParentEnd           = atoi(row_v[2].c_str());
-        frag.iBirStart            = atoi(row_v[5].c_str());
-        frag.iBirEnd              = atoi(row_v[6].c_str());
-        frag.sBir                 = row_v[7];
-        frag.iBirLength           = atoi(row_v[8].c_str());
-        frag.iTemplateStart       = atoi(row_v[9].c_str());
-        frag.iTemplateEnd         = atoi(row_v[10].c_str());
-        frag.sTemplate            = row_v[11];
-        frag.iTemplateLength      = atoi(row_v[12].c_str());
-        frag.bBirCandidateFound   = atoi(row_v[13].c_str()) != 0;
-        frag.iChromosome          = atoi(row_v[0].c_str());
-        frag.bAnchorLeft          = atoi(row_v[14].c_str()) != 0;
-        frag.iFlag                = atoi(row_v[15].c_str());
-        frag.bBadRead             = atoi(row_v[16].c_str()) != 0;
-
-        row_v.clear();
-
-        if (i % fivePercent == 0)
-            cout << "\tcandidateRead: " << i << " of " << sizeCan << " on chromosome " << iChr << " (" << ((i * 100) / sizeCan) << "%)" << endl;
-        if (frag.iChromosome != iChr && frag.iChromosome != iChr+1)
-            continue;
-        else if (frag.iChromosome != iChr && frag.iChromosome == iChr+1){
-            if (bOnlyOneChr) // if the user only wants to cluster one chromosome, we break out here
-                break;
-            ++iChr;
-            cout << "\nChromsome: " << iChr << endl;
-            if (curr.size() >= iMinConsolidate && curr.size() <= 200){ // TODO make 200 a config variable
-                vConsolidated.push_back(curr);
-                iNumReads += curr.size();
-            } else {
-                ++iSkippedCluster;
+            for (size_t j = 0; j < row.size(); ++j) {
+                row_v.push_back(remove_char(row[j], ' '));
             }
-            curr.clear();
 
-            // now instead of copying the code below, we set first to true (since it's the start of a new chromosome) and repeat the loop
-            first = true;
-            --i;
-            continue;
-        }
+            //print_vector(row_v);
 
-        if (first){
-            curr.push_back(frag);
-            first = false;
+            if (first && (i > 0)) {
+                frag = prev;
+            } else {
+                frag.sReadName            = row_v[3];
+                frag.sParentRead          = row_v[4];
+                frag.iParentStart         = atoi(row_v[1].c_str());
+                frag.iParentEnd           = atoi(row_v[2].c_str());
+                frag.iBirStart            = atoi(row_v[5].c_str());
+                frag.iBirEnd              = atoi(row_v[6].c_str());
+                frag.sBir                 = row_v[7];
+                frag.iBirLength           = atoi(row_v[8].c_str());
+                frag.iTemplateStart       = atoi(row_v[9].c_str());
+                frag.iTemplateEnd         = atoi(row_v[10].c_str());
+                frag.sTemplate            = row_v[11];
+                frag.iTemplateLength      = atoi(row_v[12].c_str());
+                frag.bBirCandidateFound   = atoi(row_v[13].c_str()) != 0;
+                frag.iChromosome          = atoi(row_v[0].c_str());
+                frag.bAnchorLeft          = atoi(row_v[14].c_str()) != 0;
+                frag.iFlag                = atoi(row_v[15].c_str());
+                frag.bBadRead             = atoi(row_v[16].c_str()) != 0; 
+            }
+            row_v.clear();
+
+            print_t_consolidated(frag);
+
+            if (i % fivePercent == 0)
+                cout << "\tcandidateRead: " << i << " of " << sizeCan << " on chromosome " << iChr << " (" << ((i * 100) / sizeCan) << "%)" << endl;
+            if (frag.iChromosome != iChr && frag.iChromosome != iChr+1)
+                continue;
+            else if (frag.iChromosome != iChr && frag.iChromosome == iChr+1){
+                if (bOnlyOneChr) // if the user only wants to cluster one chromosome, we break out here
+                    break;
+                ++iChr;
+                cout << "\nChromsome: " << iChr << endl;
+                if (curr.size() >= iMinConsolidate && curr.size() <= 200){ // TODO make 200 a config variable
+                    vConsolidated.push_back(curr);
+                    iNumReads += curr.size();
+                } else {
+                    ++iSkippedCluster;
+                }
+                curr.clear();
+
+                // now instead of copying the code below, we set first to true (since it's the start of a new chromosome) and repeat the loop
+                first = true;
+                --i;
+                prev = frag;
+                continue;
+            }
+
+            if (first){
+                curr.push_back(prev);
+                first = false;
+                iLastEndLoc = frag.iParentStart + frag.sParentRead.length() - 1;
+                continue;
+            }
+
+            if (frag.iParentStart > iLastEndLoc){
+                if (curr.size() >= iMinConsolidate && curr.size() <= 200){ // TODO make 200 a config variable
+                    vConsolidated.push_back(curr);
+                    iNumReads += curr.size();
+                } else {
+                    ++iSkippedCluster;
+                }
+                curr.clear();
+                curr.push_back(frag);
+            } else {
+                curr.push_back(frag);
+            }
             iLastEndLoc = frag.iParentStart + frag.sParentRead.length() - 1;
-            continue;
         }
-
-        if (frag.iParentStart > iLastEndLoc){
-            if (curr.size() >= iMinConsolidate && curr.size() <= 200){ // TODO make 200 a config variable
-                vConsolidated.push_back(curr);
-                iNumReads += curr.size();
-            } else {
-                ++iSkippedCluster;
-            }
-            curr.clear();
-            curr.push_back(frag);
-        } else {
-            curr.push_back(frag);
-        }
-        iLastEndLoc = frag.iParentStart + frag.sParentRead.length() - 1;
-
-        i++;
+    } catch (exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        exit(EXIT_FAILURE);
     }
     candidate_reads_file.close();
 
@@ -285,11 +294,13 @@ void consolidateLocations(){
     }
     output.close();
 
+        /*
     { // Clean up Candidate Reads File
         std::string command;
         command = "rm -f " + sProjectDirectory + "CandidateReads.csv";
         system(command.c_str());
     }
+        */
 
     // print out the half-read clustered locations
     /*fLogFileOut << "Printing half_read_clustered_locations.txt" << endl;
