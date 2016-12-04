@@ -33,7 +33,7 @@ Run M3BIRFinder with config-1.txt and designate log file location (Alignments ta
 Ensure that bwa is in the same directory as M3BIRFinder.
 
 ```bash
-$nohup ./M3BIRFinder config-1.txt -n NUMBER_OF_TREADS &> ./Log/log.txt
+$./m3birfinder config-1.txt -n NUMBER_OF_TREADS &> ./Log/log.txt
 ```
 
 Create columns.txt to be loaded into database
