@@ -75,7 +75,7 @@ void split_fastq(std::string input_filename,
     out_file.close();
 }
 
-int main(int argc, char** argv) {
+int64_t main(int64_t argc, char** argv) {
     uint64_t num_output_files = 0;
     std::string input_filename = "";
 

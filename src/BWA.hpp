@@ -10,11 +10,11 @@ class BWA {
     std::mutex mtx;
     std::vector<std::string> sReadsFile_v;
 
-    int executeBwaIndex(std::string);
-    int executeBwaAligner(std::string, std::string, std::string);
-    int getReads(std::string, std::string, std::string, std::string, bool);
-    int convertSAMtoFASTA(std::string);
-    int filterOut (std::string, std::string, std::string, std::string);
+    int64_t executeBwaIndex(std::string);
+    int64_t executeBwaAligner(std::string, std::string, std::string);
+    int64_t getReads(std::string, std::string, std::string, std::string, bool);
+    int64_t convertSAMtoFASTA(std::string);
+    int64_t filterOut (std::string, std::string, std::string, std::string);
 
     // called from within startExecutables()
     void run_alignment(std::string);
@@ -23,7 +23,7 @@ class BWA {
 
   public:
     BWA();
-    void startExecutables(int);
+    void startExecutables(int64_t);
 }; // class BWA
 } // namespace bir
 #endif //BWA_HPP

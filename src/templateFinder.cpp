@@ -22,7 +22,7 @@
 using namespace std;
 
 // templateFinder
-int startTemplateFinder(){
+int64_t startTemplateFinder(){
     cout << "\nStarting template finder ..." << endl;
     fLogFileOut << "\nStarting template finder ..." << endl;
 
@@ -31,21 +31,21 @@ int startTemplateFinder(){
     string sBir;
     string sReference;
     string sBirReversed;
-    int iBirStart = 0;
-    int iTemplateSearchDistance = confDB.getKey("searchLength").intVal;
-    int iMinBirLength = confDB.getKey("minBirLength").intVal;
-    //int iMinBirLength = 13;
-    int iChr = 0;
+    int64_t iBirStart = 0;
+    int64_t iTemplateSearchDistance = confDB.getKey("searchLength").intVal;
+    int64_t iMinBirLength = confDB.getKey("minBirLength").intVal;
+    //int64_t iMinBirLength = 13;
+    int64_t iChr = 0;
     t_alignment_struct tAligned;
-    int iSize = vCandidateRegions.size();
-    int tenPercent = iSize / 10;
+    int64_t iSize = vCandidateRegions.size();
+    int64_t tenPercent = iSize / 10;
 
     // statistics variables
-    int skipped_short = 0;
-    int skipped_stdev = 0;
+    int64_t skipped_short = 0;
+    int64_t skipped_stdev = 0;
 
     // for the candidate regions with the bBirCandidateFound flag set to TRUE...
-    for (unsigned int i = 0; i < iSize; ++i){
+    for (uint64_t i = 0; i < iSize; ++i){
         if (i % tenPercent == 0)
             cout << "template: " << (i+1) << " of " << iSize << " (" << ((i * 100) / iSize) << "%)" << endl;
         if (!vCandidateRegions[i].bBirCandidateFound)
@@ -69,11 +69,11 @@ int startTemplateFinder(){
 
         vCandidateRegions[i].sTemplate = tAligned.sAlignedRegionJ + sBirReversed[sBirReversed.length()-1];
 
-        if ((int) vCandidateRegions[i].sTemplate.length() < iMinBirLength){
+        if ((int64_t) vCandidateRegions[i].sTemplate.length() < iMinBirLength){
             ++skipped_short;
             continue;
         }
-        if ((sBir.length() * 0.8) > (int) vCandidateRegions[i].sTemplate.length()){ // TODO make 0.8 a config variable (80%)
+        if ((sBir.length() * 0.8) > (int64_t) vCandidateRegions[i].sTemplate.length()){ // TODO make 0.8 a config variable (80%)
             ++skipped_stdev;
             continue;
         }
@@ -103,11 +103,11 @@ int startTemplateFinder(){
     fLogFileOut << "  skipped (stdev): " << skipped_stdev << endl;
     fLogFileOut << "  found: " << vFinalBirLocs.size() << endl;
 
-    // print out the final BIR incidents found and the templates
+    // print64_t out the final BIR incidents found and the templates
     //printFinal();
 
-    // print final time
-    fLogFileOut << "\nFinal time: " << (int)time(NULL)-time0 << endl;
+    // print64_t final time
+    fLogFileOut << "\nFinal time: " << (int64_t)time(NULL)-time0 << endl;
 
     // clear memory
     vCandidateRegions.clear();
@@ -120,7 +120,7 @@ int startTemplateFinder(){
 string getReverseComplement(string &str){
     string rev;
 
-    for (unsigned int i = 0; i < str.length(); ++i){
+    for (uint64_t i = 0; i < str.length(); ++i){
         if (str[i] == 'A')
             rev = 'T' + rev;
         else if (str[i] == 'C')

@@ -17,6 +17,7 @@
 #include <sstream>
 #include <sys/wait.h>
 #include <stdlib.h>
+#include <cstdint>
 
 #include <thread>
 #include <mutex>
@@ -24,15 +25,15 @@
 using namespace std;
 
 
-void startExecutables(int);
+void startExecutables(int64_t);
 
-int executeBwaIndex(string sReferenceFile);
+int64_t executeBwaIndex(string sReferenceFile);
 
-int executeBwaAligner(string sReferenceFile, string sReadsFile, string sOutputFile);
+int64_t executeBwaAligner(string sReferenceFile, string sReadsFile, string sOutputFile);
 
-int getReads(string sUnalignedFile, string sBwaOutputFile, string sFlag1, string sFlag2, bool bFlagFirst);
+int64_t getReads(string sUnalignedFile, string sBwaOutputFile, string sFlag1, string sFlag2, bool bFlagFirst);
 
-int convertSAMtoFASTA(string sUnalignedFile);
+int64_t convertSAMtoFASTA(string sUnalignedFile);
 
-int filterOut (string, string, string, string);
+int64_t filterOut (string, string, string, string);
 #endif /* PROGRAM_EXECUTION_H */

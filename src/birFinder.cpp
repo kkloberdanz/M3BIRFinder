@@ -12,6 +12,7 @@
 #include <map>
 #include <vector>
 #include <sstream>
+#include <cstdint>
 #include <sys/wait.h>
 #include <stdlib.h>
 
@@ -20,9 +21,9 @@
 using namespace std;
 
 struct t_read{
-	int iLength;
-	int iStart;
-	int iChromosome;
+	int64_t iLength;
+	int64_t iStart;
+	int64_t iChromosome;
 	string sSequence;
 };
 
@@ -57,7 +58,7 @@ void sort_consolidated_file() {
 }
 
 // birFinder
-int startCandidateReads(){
+int64_t startCandidateReads(){
 	string sFinalAlignedFile = confDB.getKey("finalAlignedFile").stringVal;
 
 	if (confDB.getKey("performClustering").boolVal == false)
@@ -74,12 +75,12 @@ int startCandidateReads(){
 
 	//createParentReads();
 
-	fLogFileOut << "\nRead database time = " << (int)time(NULL)-time0 << endl;
+	fLogFileOut << "\nRead database time = " << (int64_t)time(NULL)-time0 << endl;
 
 	return 0;
 }
 
-int createSplitReadDatabase(string sAlignedFilename){
+int64_t createSplitReadDatabase(string sAlignedFilename){
 	cout << "\nCreating candidate read database starting..." << endl;
 	fLogFileOut << "\nCreating candidate read database starting..." << endl;
 	ifstream input;
@@ -89,11 +90,11 @@ int createSplitReadDatabase(string sAlignedFilename){
 	char field_delim = '\t';
 	string sReadName;
 	t_consolidated frag;
-	int iChr = 0;
-	int chromosome = confDB.getKey("chromosome").intVal;
-	int iExludedReads = 0;
-	int iBadReads = 0;
-	int index = 0;
+	int64_t iChr = 0;
+	int64_t chromosome = confDB.getKey("chromosome").intVal;
+	int64_t iExludedReads = 0;
+	int64_t iBadReads = 0;
+	int64_t index = 0;
 
 
     t_consolidated f;
@@ -111,6 +112,7 @@ int createSplitReadDatabase(string sAlignedFilename){
 	input.open((sProjectDirectory + sAlignedFilename).c_str());
     if (!input.is_open()) {
         std::cout << "Could not open file: '" << sProjectDirectory + sAlignedFilename << "'" << std::endl;
+        exit(EXIT_FAILURE);
     }
 
     ofstream output;
@@ -160,7 +162,7 @@ int createSplitReadDatabase(string sAlignedFilename){
                     continue;
                 }
 
-                for (unsigned int i = 0; i < vReferenceGenome.size(); ++i){
+                for (uint64_t i = 0; i < vReferenceGenome.size(); ++i){
                     //cout << curr[2] << " ?= " << vReferenceGenome[i].fastaHeader << endl;
                     if (curr.at(2).find(vReferenceGenome.at(i).fastaHeader) != string::npos)
                         frag.iChromosome = i;
@@ -325,5 +327,5 @@ int createSplitReadDatabase(string sAlignedFilename){
 
 	return 0;
 }
-// samtools view -S unaligned_1.sam | awk '{OFS="\t"; print ">"$1"-1\n"substr($10,1,length($10)/2)"\n>"$1"-2\n"substr($10,length($10)/2+1,length($10))}' - > filename.fasta
+// samtools view -S unaligned_1.sam | awk '{OFS="\t"; print64_t ">"$1"-1\n"substr($10,1,length($10)/2)"\n>"$1"-2\n"substr($10,length($10)/2+1,length($10))}' - > filename.fasta
 

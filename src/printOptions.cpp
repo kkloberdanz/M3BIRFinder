@@ -60,14 +60,14 @@ void printConfig(ostream& out) {
 }
 
 void printMatches(ostream& out, t_alignment_struct &tAligned){
-    int size = tAligned.sAlignedRegionI.length();
-    int counter = 0;
+    int64_t size = tAligned.sAlignedRegionI.length();
+    int64_t counter = 0;
     string astericks = "";
-    int iLongestTag = 7; // TODO maybe add a config option for longest tag?
-    int iMinTagLength = 3;
+    int64_t iLongestTag = 7; // TODO maybe add a config option for longest tag?
+    int64_t iMinTagLength = 3;
 
     // get the asterick's string
-    for (int i = 0; i < size; ++i){
+    for (int64_t i = 0; i < size; ++i){
         if (tAligned.sAlignedRegionI[i] == tAligned.sAlignedRegionJ[counter])
             astericks += "*";
         else
@@ -75,12 +75,12 @@ void printMatches(ostream& out, t_alignment_struct &tAligned){
         ++counter;
     }
 
-    int astericks_length = astericks.length();
-    int tagLength = 0;
-    int iTagStart = 0;
+    int64_t astericks_length = astericks.length();
+    int64_t tagLength = 0;
+    int64_t iTagStart = 0;
 
     // get the tag distance from end
-    for (int i = astericks_length - 1; i >= 0; --i){
+    for (int64_t i = astericks_length - 1; i >= 0; --i){
         if (astericks[i] == '*')
             ++tagLength;
         else {
@@ -94,24 +94,24 @@ void printMatches(ostream& out, t_alignment_struct &tAligned){
     out << endl;
 
 
-    // print sAlignedRegionI
-    for (int i = 0; i < size; ++i){
+    // print64_t sAlignedRegionI
+    for (int64_t i = 0; i < size; ++i){
         if (i == iTagStart + 1 && iTagStart != 0)
             out << '-';
         out << tAligned.sAlignedRegionI[i];
     }
     out << endl;
 
-    // print sAlignedRegionJ
-    for (int i = 0; i < size; ++i){
+    // print64_t sAlignedRegionJ
+    for (int64_t i = 0; i < size; ++i){
         if (i == iTagStart + 1 && iTagStart != 0)
             out << '-';
         out << tAligned.sAlignedRegionJ[i];
     }
     out << endl;
 
-    // print astericks
-    for (int i = 0; i < size; ++i){
+    // print64_t astericks
+    for (int64_t i = 0; i < size; ++i){
         if (i == iTagStart + 1 && iTagStart != 0)
             out << '-';
         out << astericks[i];
@@ -131,7 +131,7 @@ void printError(ostream& out, string &bir, string &ref, t_alignment_struct tAlig
     out << "en percent: " << (tAligned.iEndPosJ * 100 / bir.length()) << "%" << endl;
 }
 
-void printAlignment(ostream& out, string &bir, string &ref, int readStart, t_alignment_struct tAligned){
+void printAlignment(ostream& out, string &bir, string &ref, int64_t readStart, t_alignment_struct tAligned){
     out << "readStart: " << readStart << endl;
     out << "ref: " << ref << endl;
     out << "bir: " << bir << endl;
@@ -143,7 +143,7 @@ void printFinal(){
     ofstream output;
     output.open("final_bir_locations.txt");
 
-    for (unsigned int i = 0; i < vFinalBirLocs.size(); ++i){
+    for (uint64_t i = 0; i < vFinalBirLocs.size(); ++i){
         output << "Num: " << i+1 << "/" << vFinalBirLocs.size() << endl;
         output << "BIR: " << vFinalBirLocs[i].sBir << endl;
         output << " bs: " << vFinalBirLocs[i].iBirStart << endl;
@@ -164,23 +164,23 @@ void printFinal(){
 void printReferenceGenomeInfo(ostream& out){
     out << "\n----- REFERENCE GENOME INFORMATION -----" << endl;
     out << "Number of chromosomes: " << vReferenceGenome.size() << endl;
-    for (unsigned int i = 0; i < vReferenceGenome.size(); ++i)
+    for (uint64_t i = 0; i < vReferenceGenome.size(); ++i)
         out << "Chr " << i+1 << ": name = " << vReferenceGenome[i].fastaHeader << ", length = " << vReferenceGenome[i].sequence.length() << endl;
 }
 
 void printCandidateReadsInfo(ostream& out){
     out << "\n----- CANDIDATE READS INFORMATION -----" << endl;
     out << "Size: " << vCandidateReads.size() << endl;
-    int count = 0;
-    for (unsigned int i = 0; i <vCandidateReads.size(); ++i){
+    int64_t count = 0;
+    for (uint64_t i = 0; i <vCandidateReads.size(); ++i){
         if (vCandidateReads[i].bAnchorLeft)
             ++count;
     }
     out << "Anchored left: " << count << endl;
     out << "        right: " << vCandidateReads.size() - count << endl;
-    for (unsigned int i = 0; i < vReferenceGenome.size(); ++i){
+    for (uint64_t i = 0; i < vReferenceGenome.size(); ++i){
         count = 0;
-        for (unsigned int j = 0; j < vCandidateReads.size(); ++j){
+        for (uint64_t j = 0; j < vCandidateReads.size(); ++j){
             if (vCandidateReads[j].iChromosome == i)
                 ++count;
         }

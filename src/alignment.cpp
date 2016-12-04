@@ -21,8 +21,8 @@ using namespace std;
 //double delta = confDB.getKey("delta").doubleVal;
 double mu = 0.0;
 double delta = 0.0;
-//int arrIPath[1000][1000]; // the backtrack path for i
-//int arrJPath[1000][1000]; // the backtrack path for j
+//int64_t arrIPath[1000][1000]; // the backtrack path for i
+//int64_t arrJPath[1000][1000]; // the backtrack path for j
 //double matrix[1000][1000];
 
 
@@ -36,8 +36,8 @@ double delta = 0.0;
 t_alignment_struct getLocalAlignment(string seq1, string seq2, double m, double d){
 	//cout << seq1.length() << ", " << seq2.length() << endl;
 
-    std::vector<std::vector<int>> arrIPath(1000, std::vector<int>(1000, 0));
-    std::vector<std::vector<int>> arrJPath(1000, std::vector<int>(1000, 0));
+    std::vector<std::vector<int64_t>> arrIPath(1000, std::vector<int64_t>(1000, 0));
+    std::vector<std::vector<int64_t>> arrJPath(1000, std::vector<int64_t>(1000, 0));
     std::vector<std::vector<double>> matrix(1000, std::vector<double>(1000, 0));
 
 	mu = m;
@@ -48,30 +48,30 @@ t_alignment_struct getLocalAlignment(string seq1, string seq2, double m, double 
 	string sBIR = "";
 	string sTemplate = "";
 	double temp[4];
-	int iCase = 0;
-	int iLengthS1 = seq1.length();
-	int iLengthS2 = seq2.length();
+	int64_t iCase = 0;
+	int64_t iLengthS1 = seq1.length();
+	int64_t iLengthS2 = seq2.length();
 
-	/*static int arrIPath[seq1.length() + 1][seq2.length() + 1]; // the backtrack path for i
-	static int arrJPath[seq1.length() + 1][seq2.length() + 1]; // the backtrack path for j
+	/*static int64_t arrIPath[seq1.length() + 1][seq2.length() + 1]; // the backtrack path for i
+	static int64_t arrJPath[seq1.length() + 1][seq2.length() + 1]; // the backtrack path for j
 	static double matrix[seq1.length() + 1][seq2.length() + 1];
 	*/
 
 	// initialize matrix to 0s
     /*
-	for (int i = 0; i <= iLengthS1; ++i){
-		for (int j = 0; j <= iLengthS2; ++j){
+	for (int64_t i = 0; i <= iLengthS1; ++i){
+		for (int64_t j = 0; j <= iLengthS2; ++j){
 			matrix[i][j] = 0;
 		}
 	}
     */
-	for (int i = 0; i < 4; ++i)
+	for (int64_t i = 0; i < 4; ++i)
 		temp[i] = 0;
 
 	// Now we're ready for the algorithm!
 
-	for (int i = 1; i < iLengthS1; ++i){
-		for (int j = 1; j < iLengthS2; ++j){
+	for (int64_t i = 1; i < iLengthS1; ++i){
+		for (int64_t j = 1; j < iLengthS2; ++j){
 			// store the 4 possible values for a local alignment
             /*
 			temp[0] = matrix[i-1][j-1] + getSimilarityScore(seq1[i-1], seq2[j-1]); // diagonal
@@ -116,10 +116,10 @@ t_alignment_struct getLocalAlignment(string seq1, string seq2, double m, double 
 	// Ok, now we have our matrix and our backtracing path
 	// Let's scan through our matrix and find the maximum score
 	double dMax = 0.0;
-	int iMaxCoordI = 0; // i coordinate of maximum value
-	int iMaxCoordJ = 0; // j coordinate of maximum value
-	for (int i = 1; i < iLengthS1; ++i){
-		for (int j = 1; j < iLengthS2; ++j){
+	int64_t iMaxCoordI = 0; // i coordinate of maximum value
+	int64_t iMaxCoordJ = 0; // j coordinate of maximum value
+	for (int64_t i = 1; i < iLengthS1; ++i){
+		for (int64_t j = 1; j < iLengthS2; ++j){
 			if (matrix.at(i).at(j) > dMax){
 				dMax = matrix.at(i).at(j);
 				iMaxCoordI = i;
@@ -130,12 +130,12 @@ t_alignment_struct getLocalAlignment(string seq1, string seq2, double m, double 
 
 	// Now we have our maximum value and the respective coordinates
 	// Let's backtrack from that maximum value until we get to 0 (as per a local alignment)
-	int iCurrentI = iMaxCoordI;
-	int iCurrentJ = iMaxCoordJ;
-	//int iNextI = arrIPath[iCurrentI][iCurrentJ]; // the next i value to take
-	//int iNextJ = arrJPath[iCurrentI][iCurrentJ];
-	int iNextI = arrIPath.at(iCurrentI).at(iCurrentJ); // the next i value to take
-	int iNextJ = arrJPath.at(iCurrentI).at(iCurrentJ);
+	int64_t iCurrentI = iMaxCoordI;
+	int64_t iCurrentJ = iMaxCoordJ;
+	//int64_t iNextI = arrIPath[iCurrentI][iCurrentJ]; // the next i value to take
+	//int64_t iNextJ = arrJPath[iCurrentI][iCurrentJ];
+	int64_t iNextI = arrIPath.at(iCurrentI).at(iCurrentJ); // the next i value to take
+	int64_t iNextJ = arrJPath.at(iCurrentI).at(iCurrentJ);
 
 	while (((iCurrentI != iNextI) || (iCurrentJ != iNextJ)) && (iNextI != 0) && (iNextJ != 0)){
 		if (iNextI == iCurrentI) // A deletion in seq A (the template)
@@ -184,31 +184,31 @@ t_alignment_struct getGlobalAlignment(string &seq1, string &seq2, double m, doub
 	//double matrix[seq1.length()+1][seq2.length()+1];
     std::vector<std::vector<double>> matrix(seq1.length()+1, std::vector<double>(seq2.length()+1 , 0));
 	double temp[3]; // ******* CHANGE TO 4 FOR LOCAL ALIGNEMNT
-	int iCase;
-	int iLengthS1 = seq1.length();
-	int iLengthS2 = seq2.length();
+	int64_t iCase;
+	int64_t iLengthS1 = seq1.length();
+	int64_t iLengthS2 = seq2.length();
 
 	t_alignment_struct tReturn;
 
 
 	// initialize matrix to 0s
     /*
-	for (int i = 0; i <= iLengthS1; ++i){
-		for (int j = 0; j < iLengthS2; ++j){
+	for (int64_t i = 0; i <= iLengthS1; ++i){
+		for (int64_t j = 0; j < iLengthS2; ++j){
 			matrix[i][j] = 0;
 		}
 	}
     */
 
-	for (int i = 0; i <= iLengthS1; ++i)
+	for (int64_t i = 0; i <= iLengthS1; ++i)
 		matrix[i][0] = delta*i;
-	for (int j = 0; j < iLengthS2; ++j)
+	for (int64_t j = 0; j < iLengthS2; ++j)
 		matrix[0][j] = delta*j;
 
 	// Now we're ready for the algorithm!
 
-	for (int i = 1; i <= iLengthS1; ++i){
-		for (int j = 1; j <= iLengthS2; ++j){
+	for (int64_t i = 1; i <= iLengthS1; ++i){
+		for (int64_t j = 1; j <= iLengthS2; ++j){
 			// store the 3 possible values for a global alignment
 			temp[0] = matrix[i-1][j-1] + getSimilarityScore(seq1[i-1], seq2[j-1]); // diagonal
 			temp[1] = matrix[i-1][j] - delta; // directly above
@@ -225,8 +225,8 @@ t_alignment_struct getGlobalAlignment(string &seq1, string &seq2, double m, doub
 
 	// Now we have our maximum value and the respective coordinates
 	// Let's backtrack from that maximum value until we get to 0 (as per a local alignment)
-	int iCurrI = iLengthS1;
-	int iCurrJ = iLengthS2;
+	int64_t iCurrI = iLengthS1;
+	int64_t iCurrJ = iLengthS2;
 
 	while (iCurrI > 0 || iCurrJ > 0){
 		if (iCurrI > 0 && iCurrJ > 0 && matrix[iCurrI][iCurrJ] == (matrix[iCurrI-1][iCurrJ-1] + getSimilarityScore(seq1[iCurrI-1], seq2[iCurrJ-1]))){
@@ -287,11 +287,11 @@ double getSimilarityScore(char a, char b){
  * maximum case (i.e. 1-4) of the four values
  * ************************************************************
  */
-int getMaxArrayValue(double array[], int length){
+int64_t getMaxArrayValue(double array[], int64_t length){
 	double max = array[0];
-	int iCase = 0; // which of the 4 cases contains the highest
+	int64_t iCase = 0; // which of the 4 cases contains the highest
 
-	for (int i = 1; i < length; ++i){
+	for (int64_t i = 1; i < length; ++i){
 		if (array[i] > max){
 			max = array[i];
 			iCase = i;
