@@ -20,7 +20,6 @@
 #include <thread>
 
 #include "programExecution.h"
-#include "BWA.hpp" 
 
 uint NUM_THREADS = 1;
 std::string  PROGRAM_NAME;
