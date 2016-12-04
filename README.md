@@ -230,6 +230,9 @@ The outputted file 'mysql_results.txt' is then used as an input for the second h
 
 **Don't forget to change the configuration file to not run the initial alignment and clustering again!!**  
 
+URL
+----
+https://github.com/kkloberdanz/M3BIRFinder
 
 License
 ----
