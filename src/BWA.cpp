@@ -33,7 +33,7 @@ BWA::BWA() {
     sReadsFile_v.push_back("ALM29_ACTGAT_L008_R1_001.part_7.fastq"); 
 }
 
-void BWA::startExecutables(int64_t reads_file_index) {
+void BWA::startExecutables(int reads_file_index) {
 
     /*
      * TODO:
@@ -66,13 +66,13 @@ void BWA::startExecutables(int64_t reads_file_index) {
 
             cout << "Making threads" << endl;
             thread t[NUM_THREADS];
-            for (int64_t i = 0; i < NUM_THREADS; ++i) {
+            for (int i = 0; i < NUM_THREADS; ++i) {
                 // function call here
                 //t[i] = thread(run_alignment, sReferenceFile);
                 t[i] = thread(test_run_alignment, sReferenceFile);
             } 
 
-            for (int64_t i = 0; i < NUM_THREADS; ++i) {
+            for (int i = 0; i < NUM_THREADS; ++i) {
                 t[i].join();
             } 
             cout << "Threads rejoined" << endl;
@@ -131,8 +131,8 @@ void BWA::startExecutables(int64_t reads_file_index) {
 
     }
 
-    cout << "\nBWA time = " << (int64_t)time(NULL)-time0 << endl;
-    fLogFileOut << "\nBWA time = " << (int64_t)time(NULL)-time0 << endl;
+    cout << "\nBWA time = " << (int)time(NULL)-time0 << endl;
+    fLogFileOut << "\nBWA time = " << (int)time(NULL)-time0 << endl;
 
     if (confDB.getKey("onlyAlign").boolVal == true)
         exit(1);
@@ -141,7 +141,7 @@ void BWA::startExecutables(int64_t reads_file_index) {
 
 }
 
-int64_t BWA::executeBwaIndex(std::string sReferenceFile) {
+int BWA::executeBwaIndex(std::string sReferenceFile) {
     //mtx.lock();
     string command;
 
@@ -157,7 +157,7 @@ int64_t BWA::executeBwaIndex(std::string sReferenceFile) {
     return 0; 
 }
 
-int64_t BWA::executeBwaAligner(std::string sReferenceFile, std::string sReadsFile, std::string sOutputFile) {
+int BWA::executeBwaAligner(std::string sReferenceFile, std::string sReadsFile, std::string sOutputFile) {
     std::string command;
 
     // run the BWA alignment algorithm
@@ -172,7 +172,7 @@ int64_t BWA::executeBwaAligner(std::string sReferenceFile, std::string sReadsFil
     return 0; 
 }
 
-int64_t BWA::getReads(std::string sUnalignedFile, std::string sBwaOutputFile, 
+int BWA::getReads(std::string sUnalignedFile, std::string sBwaOutputFile, 
                  std::string sFlag1, std::string sFlag2, bool bFlagFirst){
     bool bPairedEnd = confDB.getKey("pairedEnd").boolVal;
     std::string command;
@@ -187,14 +187,14 @@ int64_t BWA::getReads(std::string sUnalignedFile, std::string sBwaOutputFile,
             command = "samtools view -h " + sFlag1 + " -S " + sProjectDirectory + sBwaOutputFile + " > " + sProjectDirectory + sUnalignedFile + "_flag_1.sam";
 
         // run samtools to get unaligned reads
-        cout << "\nget samtools reads with flag " + sFlag1 + " int64_to " << sProjectDirectory + sUnalignedFile << "_flag_1..." << endl;
-        fLogFileOut << "\nget samtools reads with flag " + sFlag1 + " int64_to " << sProjectDirectory + sUnalignedFile << "_flag_1..." << endl;
+        cout << "\nget samtools reads with flag " + sFlag1 + " into " << sProjectDirectory + sUnalignedFile << "_flag_1..." << endl;
+        fLogFileOut << "\nget samtools reads with flag " + sFlag1 + " into " << sProjectDirectory + sUnalignedFile << "_flag_1..." << endl;
         system(command.c_str());
 
         if (sFlag2.compare("") != 0){
             command = "samtools view -h " + sFlag2 + " -S " + sProjectDirectory + sBwaOutputFile + " > " + sProjectDirectory + sUnalignedFile + "_flag_2.sam";
-            cout << "\nget samtools reads with flag " + sFlag2 + " int64_to " << sProjectDirectory + sUnalignedFile << "_flag_2..." << endl;
-            fLogFileOut << "get samtools reads with flag " + sFlag2 + " int64_to " << sProjectDirectory + sUnalignedFile << "_flag_2..." << endl;
+            cout << "\nget samtools reads with flag " + sFlag2 + " into " << sProjectDirectory + sUnalignedFile << "_flag_2..." << endl;
+            fLogFileOut << "get samtools reads with flag " + sFlag2 + " into " << sProjectDirectory + sUnalignedFile << "_flag_2..." << endl;
             system(command.c_str());
 
             // merge two files together
@@ -221,10 +221,10 @@ int64_t BWA::getReads(std::string sUnalignedFile, std::string sBwaOutputFile,
 
 }
 
-int64_t BWA::convertSAMtoFASTA(std::string sUnalignedFile) {
+int BWA::convertSAMtoFASTA(std::string sUnalignedFile) {
     std::string command = "";
     command = "samtools view -S " + sProjectDirectory + sUnalignedFile + ".sam | ";
-    command += " awk '{OFS=\"\t\"; print64_t \">\"$1\"-1\\n\"substr($10,1,length($10)/2)\"\\n>\"$1\"-2\\n\"substr($10,length($10)/2+1,length($10))}' - > ";
+    command += " awk '{OFS=\"\t\"; print \">\"$1\"-1\\n\"substr($10,1,length($10)/2)\"\\n>\"$1\"-2\\n\"substr($10,length($10)/2+1,length($10))}' - > ";
     command += sProjectDirectory + sUnalignedFile + ".temp";
 
     cout << "\nConverting SAM to FASTA..." << endl;
@@ -237,10 +237,10 @@ int64_t BWA::convertSAMtoFASTA(std::string sUnalignedFile) {
     input.open(line.c_str());
     line = sProjectDirectory + sUnalignedFile + ".fasta";
     output.open(line.c_str());
-    //int64_t iLength = 0; // length of the nucleotide sequence
-    uint64_t iMinSeqLength = confDB.getKey("minSeqLength").intVal;
-    int64_t count = 1;
-    int64_t iTooShort = 0;
+    //int iLength = 0; // length of the nucleotide sequence
+    uint iMinSeqLength = confDB.getKey("minSeqLength").intVal;
+    int count = 1;
+    int iTooShort = 0;
     string header = "";
 
     while (input.good()){
@@ -275,16 +275,16 @@ int64_t BWA::convertSAMtoFASTA(std::string sUnalignedFile) {
     return 0;
 }
 
-int64_t BWA::filterOut (std::string sOutputFile, std::string sInputFile, 
+int BWA::filterOut (std::string sOutputFile, std::string sInputFile, 
                     std::string sFlag1, std::string sFlag2){
     std::string command;
 
     std::cout << "\nfiltering " + sFlag1 + " out of " + sProjectDirectory + sInputFile + 
-        " int64_to " + sProjectDirectory + sOutputFile + ".temp..." 
+        " into " + sProjectDirectory + sOutputFile + ".temp..." 
     << std::endl;
 
     fLogFileOut << "\nfiltering " + sFlag1 + " out of " + sProjectDirectory + sInputFile + 
-        " int64_to " + sProjectDirectory + sOutputFile + ".temp..." 
+        " into " + sProjectDirectory + sOutputFile + ".temp..." 
     << std::endl;
 
     command = "samtools view -h " + sFlag1 + " -S " + sProjectDirectory + sInputFile + 
@@ -294,11 +294,11 @@ int64_t BWA::filterOut (std::string sOutputFile, std::string sInputFile,
 
     if (sFlag2.compare("") != 0){
         std::cout << "filtering " + sFlag2 + " out of " + 
-            sProjectDirectory + sInputFile + " int64_to " + sProjectDirectory + 
+            sProjectDirectory + sInputFile + " into " + sProjectDirectory + 
             sOutputFile + ".sam..." 
         << std::endl;
 
-        fLogFileOut << "filtering " + sFlag2 + " out of " + sProjectDirectory + sInputFile + " int64_to " +sProjectDirectory +  sOutputFile + ".sam..." << endl;
+        fLogFileOut << "filtering " + sFlag2 + " out of " + sProjectDirectory + sInputFile + " into " +sProjectDirectory +  sOutputFile + ".sam..." << endl;
         command = "samtools view -h " + sFlag2 + " -S " + sProjectDirectory + sOutputFile + ".temp > " + sProjectDirectory + sOutputFile + ".sam";
         system(command.c_str());
 

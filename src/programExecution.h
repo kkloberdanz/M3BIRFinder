@@ -25,15 +25,15 @@
 using namespace std;
 
 
-void startExecutables(int64_t);
+void startExecutables(int);
 
-int64_t executeBwaIndex(string sReferenceFile);
+int executeBwaIndex(string sReferenceFile);
 
-int64_t executeBwaAligner(string sReferenceFile, string sReadsFile, string sOutputFile);
+int executeBwaAligner(string sReferenceFile, string sReadsFile, string sOutputFile);
 
-int64_t getReads(string sUnalignedFile, string sBwaOutputFile, string sFlag1, string sFlag2, bool bFlagFirst);
+int getReads(string sUnalignedFile, string sBwaOutputFile, string sFlag1, string sFlag2, bool bFlagFirst);
 
-int64_t convertSAMtoFASTA(string sUnalignedFile);
+int convertSAMtoFASTA(string sUnalignedFile);
 
-int64_t filterOut (string, string, string, string);
+int filterOut (string, string, string, string);
 #endif /* PROGRAM_EXECUTION_H */

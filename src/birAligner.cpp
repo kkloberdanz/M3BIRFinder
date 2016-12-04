@@ -27,42 +27,42 @@ using namespace std;
 #define UNKNOWN 3
 
 // birAligner
-int64_t startBirFinder(){
+int startBirFinder(){
     cout << "\nStarting birFinder ..." << endl;
     fLogFileOut << "\nStarting birFinder ..." << endl;
 
     string sReference;
     string sBirSearchRegion;
     t_alignment_struct tAligned;
-    int64_t iFudgeFactor = confDB.getKey("tolerance").intVal;
-    int64_t iReadStart = 0; // the starting position of the read
-    int64_t iLastPos = 0; // a multi-use variable to keep the location of the aligned reads for RIGHT and LEFT anchored
-    int64_t iStartPercentage = 0;
-    int64_t iEndPercentage = 0;
-    int64_t iMinAlignedLength = confDB.getKey("minAlignedLength").intVal; // 12
-    int64_t iChr = 0;
-    int64_t size = vCandidateRegions.size();
-    int64_t tenPercent = size / 10;
+    int iFudgeFactor = confDB.getKey("tolerance").intVal;
+    int iReadStart = 0; // the starting position of the read
+    int iLastPos = 0; // a multi-use variable to keep the location of the aligned reads for RIGHT and LEFT anchored
+    int iStartPercentage = 0;
+    int iEndPercentage = 0;
+    int iMinAlignedLength = confDB.getKey("minAlignedLength").intVal; // 12
+    int iChr = 0;
+    int size = vCandidateRegions.size();
+    int tenPercent = size / 10;
 
     // statistics variables
-    int64_t skipped_short = 0;
-    int64_t skipped_pos = 0;
-    int64_t skipped_state1 = 0;
-    int64_t pos1 = 0;
-    int64_t left = 0;
-    int64_t right = 0;
-    int64_t unknown = 0;
-    int64_t iState = 0; // the state
+    int skipped_short = 0;
+    int skipped_pos = 0;
+    int skipped_state1 = 0;
+    int pos1 = 0;
+    int left = 0;
+    int right = 0;
+    int unknown = 0;
+    int iState = 0; // the state
 
     ofstream output;
     output.open((sProjectDirectory + "consensus_reads.txt").c_str());
     output << "i, chr, start, size, sequence" << endl;
-    for (int64_t i = 0; i < size; ++i)
+    for (int i = 0; i < size; ++i)
         output << i << ", " << vCandidateRegions[i].iChromosome << ", " << vCandidateRegions[i].iParentStart << ", " << vCandidateRegions[i].sParentRead.length() << ", " << vCandidateRegions[i].sParentRead << endl;
     output.close();
 
     // Finally, let's repeat what we did at the start to find the BIR loc only this time reinforce it by searching for the template
-    for (int64_t i = 0; i < size; ++i){
+    for (int i = 0; i < size; ++i){
         if (i % tenPercent == 0)
             cout << "candidate: " << (i+1) << " of " << size << " (" << ((i * 100) / size) << "%)" << endl;
         iReadStart = vCandidateRegions[i].iParentStart;
@@ -92,7 +92,7 @@ int64_t startBirFinder(){
         else if (iEndPercentage < (100 - iFudgeFactor) && iStartPercentage <= iFudgeFactor)
             iState = LEFT_ANCHORED;
         // otherwise it is an ideal STATE_1 candidate and requires a FSM to get the coordinates
-        else if (iStartPercentage <= iFudgeFactor && (int64_t) iEndPercentage >= (100 - iFudgeFactor))
+        else if (iStartPercentage <= iFudgeFactor && (int) iEndPercentage >= (100 - iFudgeFactor))
             iState = STATE_1;
         else
             iState = UNKNOWN;
@@ -146,7 +146,7 @@ int64_t startBirFinder(){
                 ++skipped_short;
                 vCandidateRegions[i].bBirCandidateFound = false;
             }
-            else if (tAligned.iStartPosJ > iMinAlignedLength && (int64_t) sBirSearchRegion.length() - tAligned.iEndPosJ < iFudgeFactor){
+            else if (tAligned.iStartPosJ > iMinAlignedLength && (int) sBirSearchRegion.length() - tAligned.iEndPosJ < iFudgeFactor){
                 vCandidateRegions[i].sBir = sBirSearchRegion.substr(0, tAligned.iStartPosJ);
                 vCandidateRegions[i].iBirStart = iReadStart + iLastPos + 1;
                 vCandidateRegions[i].iBirEnd = iReadStart + iLastPos + tAligned.iStartPosJ;
@@ -193,7 +193,7 @@ int64_t startBirFinder(){
     fLogFileOut << "  right: " << right << endl;
     fLogFileOut << "  unknown: " << unknown << endl;
 
-    fLogFileOut << "\nBIR alignment time = " << (int64_t)time(NULL)-time0 << endl;
+    fLogFileOut << "\nBIR alignment time = " << (int)time(NULL)-time0 << endl;
 
     return 0;
 }
@@ -212,25 +212,25 @@ int64_t startBirFinder(){
  *
  * NOTE: This assumes that the template and read start at the same position
  */
-void getBirLoc(t_alignment_struct tAligned, int64_t st, int64_t curr){
+void getBirLoc(t_alignment_struct tAligned, int st, int curr){
     t_consolidated locs;
 
     string reference = tAligned.sAlignedRegionI;
     string birRegion = tAligned.sAlignedRegionJ;
-    int64_t iMissCount = confDB.getKey("missCount").intVal; // 3
-    int64_t iHitCount = confDB.getKey("hitCount").intVal; // 4
-    int64_t iRefPos = -1;
-    int64_t iLastPos = 0;
-    int64_t length = birRegion.length();
-    int64_t iMisses = 0;
-    int64_t iHits = 0;
-    int64_t start = 0;
-    int64_t end = 0;
+    int iMissCount = confDB.getKey("missCount").intVal; // 3
+    int iHitCount = confDB.getKey("hitCount").intVal; // 4
+    int iRefPos = -1;
+    int iLastPos = 0;
+    int length = birRegion.length();
+    int iMisses = 0;
+    int iHits = 0;
+    int start = 0;
+    int end = 0;
     bool isGood = false;
 
-    int64_t nState = STATE_LEFT;
+    int nState = STATE_LEFT;
 
-    for (int64_t i = 0; i < length; ++i){
+    for (int i = 0; i < length; ++i){
         ++iRefPos;
 
         switch (nState) {

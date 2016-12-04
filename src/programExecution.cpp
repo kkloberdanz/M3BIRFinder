@@ -29,7 +29,7 @@ std::vector<std::string> sReadsFile_v;
 void build_reads_sReadsFile_v(std::string sReadsFile) {
     size_t lastindex = sReadsFile.find_last_of("."); 
     std::string without_extension = sReadsFile.substr(0, lastindex); 
-    for (uint64_t i = 0; i < NUM_THREADS; ++i) {
+    for (unsigned int i = 0; i < NUM_THREADS; ++i) {
         sReadsFile_v.push_back(without_extension + ".part_" + std::to_string(i) + ".fastq");
         std::cout << "Pushed: " << without_extension + ".part_" + std::to_string(i) + ".fastq" << std::endl;
     }
@@ -41,7 +41,7 @@ void run_index_genome(std::string sReferenceFile) {
         cout << "BWA index exited incorrectly" << endl;
 }
 
-void run_full_align(uint64_t threadnum, std::string sReferenceFile, std::string sReadsFile, std::string sOutputFile) {
+void run_full_align(unsigned int threadnum, std::string sReferenceFile, std::string sReadsFile, std::string sOutputFile) {
     mtx.lock();
     if (threadnum)
         cout << "running thread: " << threadnum << endl;
@@ -51,15 +51,15 @@ void run_full_align(uint64_t threadnum, std::string sReferenceFile, std::string 
         cout << "BWA aligner 1 exited incorrectly" << endl;
 }
 
-void run_convertSAMtoFASTA(uint64_t threadnum, std::string sUnalignedFile) {
+void run_convertSAMtoFASTA(unsigned int threadnum, std::string sUnalignedFile) {
     convertSAMtoFASTA(sUnalignedFile);
 }
 
-void run_filterOut(uint64_t threadnum, std::string sOutputFile, std::string sInputFile, std::string sFlag1, std::string sFlag2) {
+void run_filterOut(unsigned int threadnum, std::string sOutputFile, std::string sInputFile, std::string sFlag1, std::string sFlag2) {
     filterOut(sOutputFile, sInputFile, sFlag1, sFlag2);
 }
 
-void run_executeBwaAligner(uint64_t threadnum, std::string sReferenceFile, std::string sUnalignedFile, std::string sOutputFile) {
+void run_executeBwaAligner(unsigned int threadnum, std::string sReferenceFile, std::string sUnalignedFile, std::string sOutputFile) {
     executeBwaAligner(sReferenceFile,(sUnalignedFile), (sOutputFile));
 }
 
@@ -83,7 +83,7 @@ void remove_header(std::string filename) {
 
     mtx.unlock();
     bool keep_line = false;
-    int64_t i = 0;
+    int i = 0;
     while (std::getline(input, line)) { 
 
         if (line[0] != '@') {
@@ -101,7 +101,7 @@ void remove_header(std::string filename) {
     mtx.unlock();
 }
 
-void run_get_reads(uint64_t threadnum,
+void run_get_reads(unsigned int threadnum,
                    std::string sUnalignedFile, 
                    std::string sOutputFile, 
                    std::string option1, 
@@ -127,7 +127,7 @@ void concatenate_to_file(std::vector<std::string> input_v, std::string output_fi
     } 
 }
 
-int64_t startExecutables(int64_t reads_file_index){
+int startExecutables(int reads_file_index){
 
     cout << "Launched from thread: " << reads_file_index << endl;
     //string sReadsFile = sReadsFile_v[reads_file_index];
@@ -169,26 +169,26 @@ int64_t startExecutables(int64_t reads_file_index){
                 cout << "Making threads" << endl;
                 std::vector<std::thread> t;
                 cout << "running run_full_align()" << endl;
-                for (uint64_t i = 0; i < NUM_THREADS; ++i) {
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
                     sReadsFile = sReadsFile_v[i];
                     t.push_back(thread(run_full_align, i, sReferenceFile, sReadsFile, sOutputFile + std::to_string(i)));
                 } 
 
                 // join threads here
-                for (uint64_t i = 0; i < NUM_THREADS; ++i) {
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
                     t[i].join();
                 } 
                 cout << "Threads rejoined" << endl;
 
                 /*
-                cout << "Concatenating output files back int64_to one file" << endl; 
+                cout << "Concatenating output files back into one file" << endl; 
 
                 {
                 std::string command = "rm -f " + sProjectDirectory + sOutputFile + "_1.sam";
                 system(command.c_str());
                 } 
 
-                for (uint64_t i = 0; i < NUM_THREADS; ++i) {
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
                     if (i > 0) {
                         remove_header(sProjectDirectory + sOutputFile + std::to_string(i) + "_1.sam");
                     }
@@ -220,13 +220,13 @@ int64_t startExecutables(int64_t reads_file_index){
                 cout << "Making threads" << endl;
                 std::vector<std::thread> t;
                 cout << "running run_get_reads()" << endl;
-                for (uint64_t i = 0; i < NUM_THREADS; ++i) {
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
                     std::string str_i = std::to_string(i);
                     t.push_back(thread(run_get_reads, i, (sUnalignedFile + str_i + "_1"), (sOutputFile + str_i + "_1.sam"), "-f 4", "", true));
                 } 
 
                 // join threads here
-                for (uint64_t i = 0; i < NUM_THREADS; ++i) {
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
                     t[i].join();
                 } 
                 cout << "Threads rejoined" << endl;
@@ -248,13 +248,13 @@ int64_t startExecutables(int64_t reads_file_index){
                 cout << "Making threads" << endl;
                 std::vector<std::thread> t;
                 cout << "running run_get_reads()" << endl;
-                for (uint64_t i = 0; i < NUM_THREADS; ++i) {
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
                     std::string str_i = std::to_string(i);
                     t.push_back(thread(run_get_reads, i, (sUnalignedFile + str_i + "_1"), (sAlignedFile + str_i), "-f 4", "", true));
                 } 
 
                 // join threads here
-                for (uint64_t i = 0; i < NUM_THREADS; ++i) {
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
                     t[i].join();
                 } 
                 cout << "Threads rejoined" << endl;
@@ -277,14 +277,14 @@ int64_t startExecutables(int64_t reads_file_index){
             if (NUM_THREADS > 1) {
                 cout << "Making threads" << endl;
                 std::vector<std::thread> t;
-                for (uint64_t i = 0; i < NUM_THREADS; ++i) {
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
                     std::string str_i = std::to_string(i);
                     //t.push_back(thread(run_get_reads, i, (sUnalignedFile + "_1"), (sAlignedFile + str_i), "-f 4", "", true));
                     t.push_back(thread(run_convertSAMtoFASTA, i, (sUnalignedFile + str_i + "_1")));
                 } 
 
                 // join threads here
-                for (uint64_t i = 0; i < NUM_THREADS; ++i) {
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
                     t[i].join();
                 } 
                 cout << "Threads rejoined" << endl;
@@ -308,7 +308,7 @@ int64_t startExecutables(int64_t reads_file_index){
             if (NUM_THREADS > 1) {
                 cout << "Making threads" << endl;
                 std::vector<std::thread> t;
-                for (uint64_t i = 0; i < NUM_THREADS; ++i) {
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
                     std::string str_i = std::to_string(i);
                     //t.push_back(thread(run_get_reads, i, (sUnalignedFile + "_1"), (sAlignedFile + str_i), "-f 4", "", true));
                     t.push_back(thread(run_executeBwaAligner, i, sReferenceFile,(sUnalignedFile + str_i + "_1.fasta"), (sOutputFile + str_i + "_2")));
@@ -316,7 +316,7 @@ int64_t startExecutables(int64_t reads_file_index){
                 } 
 
                 // join threads here
-                for (uint64_t i = 0; i < NUM_THREADS; ++i) {
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
                     t[i].join();
                 } 
                 cout << "Threads rejoined" << endl;
@@ -342,14 +342,14 @@ int64_t startExecutables(int64_t reads_file_index){
             if (NUM_THREADS > 1) {
                 cout << "Making threads" << endl;
                 std::vector<std::thread> t;
-                for (uint64_t i = 0; i < NUM_THREADS; ++i) {
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
                     std::string str_i = std::to_string(i);
                     t.push_back(thread(run_get_reads, i, (sUnalignedFile + str_i + "_2"), (sOutputFile + str_i + "_2.sam"), "-f 4", "", false));
 
                 } 
 
                 // join threads here
-                for (uint64_t i = 0; i < NUM_THREADS; ++i) {
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
                     t[i].join();
                 } 
                 cout << "Threads rejoined" << endl;
@@ -375,14 +375,14 @@ int64_t startExecutables(int64_t reads_file_index){
             if (NUM_THREADS > 1) {
                 cout << "Making threads" << endl;
                 std::vector<std::thread> t;
-                for (uint64_t i = 0; i < NUM_THREADS; ++i) {
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
                     std::string str_i = std::to_string(i);
                     t.push_back(thread(run_filterOut, i, (sFinalAlignedFile + str_i), (sOutputFile + str_i + "_2"), "-F 4", ""));
 
                 } 
 
                 // join threads here
-                for (uint64_t i = 0; i < NUM_THREADS; ++i) {
+                for (unsigned int i = 0; i < NUM_THREADS; ++i) {
                     t[i].join();
                 } 
                 cout << "Threads rejoined" << endl;
@@ -400,8 +400,8 @@ int64_t startExecutables(int64_t reads_file_index){
 
     }
 
-    cout << "\nBWA time = " << (int64_t)time(NULL)-time0 << endl;
-    fLogFileOut << "\nBWA time = " << (int64_t)time(NULL)-time0 << endl;
+    cout << "\nBWA time = " << (int)time(NULL)-time0 << endl;
+    fLogFileOut << "\nBWA time = " << (int)time(NULL)-time0 << endl;
 
     std::cout << "startExecutables finished" << std::endl; 
     std::cout << "Concatenating temp files" << std::endl;
@@ -421,16 +421,14 @@ int64_t startExecutables(int64_t reads_file_index){
         unaligned_1_sam_input_v.push_back(sProjectDirectory + sUnalignedFile + std::to_string(i) + "_1.sam");
         unaligned_1_fasta_input_v.push_back(sProjectDirectory + sUnalignedFile + std::to_string(i) + "_1.fasta");
         unaligned_2_sam_input_v.push_back(sProjectDirectory + sUnalignedFile + std::to_string(i) + "_2.sam");
-        //bwaAligned_input_v.push_back(sProjectDirectory + "bwaAligned" + std::to_string(i) + ".sam");
-        bwaAligned_input_v.push_back(sProjectDirectory + sAlignedFile + std::to_string(i) + ".sam");
+        bwaAligned_input_v.push_back(sProjectDirectory + "bwaAligned" + std::to_string(i) + ".sam");
     }
     //concatenate_to_file(bwaOutput_1_input_v, sProjectDirectory + sOutputFile + "_1.sam");
     concatenate_to_file(bwaOutput_2_input_v, sProjectDirectory + sOutputFile + "_2.sam"); 
     concatenate_to_file(unaligned_1_sam_input_v, sProjectDirectory + sUnalignedFile + "_1.sam"); 
     concatenate_to_file(unaligned_1_fasta_input_v, sProjectDirectory + sUnalignedFile + "_1.fasta");
     concatenate_to_file(unaligned_2_sam_input_v, sProjectDirectory + sUnalignedFile + "_2.sam");
-    //concatenate_to_file(bwaAligned_input_v, sProjectDirectory + "bwaAligned.sam");
-    concatenate_to_file(bwaAligned_input_v, sProjectDirectory + sAlignedFile);
+    concatenate_to_file(bwaAligned_input_v, sProjectDirectory + "bwaAligned.sam");
 
     if (confDB.getKey("onlyAlign").boolVal == true)
         exit(1);
@@ -439,7 +437,7 @@ int64_t startExecutables(int64_t reads_file_index){
     return 0;
 }
 
-int64_t executeBwaIndex(string sReferenceFile){
+int executeBwaIndex(string sReferenceFile){
 
     cout << "; running executeBwaIndex()" << endl;
 
@@ -460,7 +458,7 @@ int64_t executeBwaIndex(string sReferenceFile){
     return 0;
 }
 
-int64_t executeBwaAligner(string sReferenceFile, string sReadsFile, string sOutputFile){
+int executeBwaAligner(string sReferenceFile, string sReadsFile, string sOutputFile){
     cout << "; running executeBwaAligner()" << endl;
     string command;
 
@@ -477,7 +475,7 @@ int64_t executeBwaAligner(string sReferenceFile, string sReadsFile, string sOutp
     return 0;
 }
 
-int64_t getReads(string sUnalignedFile, string sBwaOutputFile, string sFlag1, string sFlag2, bool bFlagFirst){
+int getReads(string sUnalignedFile, string sBwaOutputFile, string sFlag1, string sFlag2, bool bFlagFirst){
 
     cout << "; running getReads()" << endl;
 
@@ -503,8 +501,8 @@ int64_t getReads(string sUnalignedFile, string sBwaOutputFile, string sFlag1, st
                 sProjectDirectory + sUnalignedFile + "_flag_1.sam";
 
         // run samtools to get unaligned reads
-        cout << "\nget samtools reads with flag " + sFlag1 + " int64_to " << sProjectDirectory + sUnalignedFile << "_flag_1..." << endl;
-        fLogFileOut << "\nget samtools reads with flag " + sFlag1 + " int64_to " << sProjectDirectory + sUnalignedFile << "_flag_1..." << endl;
+        cout << "\nget samtools reads with flag " + sFlag1 + " into " << sProjectDirectory + sUnalignedFile << "_flag_1..." << endl;
+        fLogFileOut << "\nget samtools reads with flag " + sFlag1 + " into " << sProjectDirectory + sUnalignedFile << "_flag_1..." << endl;
 
         std::cout << "Running: " << command << std::endl;
         system(command.c_str());
@@ -513,8 +511,8 @@ int64_t getReads(string sUnalignedFile, string sBwaOutputFile, string sFlag1, st
             command = "samtools view -h " + sFlag2 + " -S " + 
                 sProjectDirectory + sBwaOutputFile + " > " + sProjectDirectory + sUnalignedFile + "_flag_2.sam";
 
-            cout << "\nget samtools reads with flag " + sFlag2 + " int64_to " << sProjectDirectory + sUnalignedFile << "_flag_2..." << endl;
-            fLogFileOut << "get samtools reads with flag " + sFlag2 + " int64_to " << sProjectDirectory + sUnalignedFile << "_flag_2..." << endl;
+            cout << "\nget samtools reads with flag " + sFlag2 + " into " << sProjectDirectory + sUnalignedFile << "_flag_2..." << endl;
+            fLogFileOut << "get samtools reads with flag " + sFlag2 + " into " << sProjectDirectory + sUnalignedFile << "_flag_2..." << endl;
             system(command.c_str());
 
             // merge two files together
@@ -542,12 +540,12 @@ int64_t getReads(string sUnalignedFile, string sBwaOutputFile, string sFlag1, st
     return 0;
 }
 
-int64_t convertSAMtoFASTA(string sUnalignedFile){
+int convertSAMtoFASTA(string sUnalignedFile){
     cout << "sUnalignedFile: " << sUnalignedFile << endl;
     cout << "; running convertSAMtoFASTA()" << endl;
     string command = "";
     command = "samtools view -S " + sProjectDirectory + sUnalignedFile + ".sam | ";
-    command += " awk '{OFS=\"\t\"; print64_t \">\"$1\"-1\\n\"substr($10,1,length($10)/2)\"\\n>\"$1\"-2\\n\"substr($10,length($10)/2+1,length($10))}' - > ";
+    command += " awk '{OFS=\"\t\"; print \">\"$1\"-1\\n\"substr($10,1,length($10)/2)\"\\n>\"$1\"-2\\n\"substr($10,length($10)/2+1,length($10))}' - > ";
     command += sProjectDirectory + sUnalignedFile + ".temp";
 
     cout << "\nConverting SAM to FASTA..." << endl;
@@ -560,10 +558,10 @@ int64_t convertSAMtoFASTA(string sUnalignedFile){
     input.open(line.c_str());
     line = sProjectDirectory + sUnalignedFile + ".fasta";
     output.open(line.c_str());
-    //int64_t iLength = 0; // length of the nucleotide sequence
-    uint64_t iMinSeqLength = confDB.getKey("minSeqLength").intVal;
-    int64_t count = 1;
-    int64_t iTooShort = 0;
+    //int iLength = 0; // length of the nucleotide sequence
+    unsigned int iMinSeqLength = confDB.getKey("minSeqLength").intVal;
+    int count = 1;
+    int iTooShort = 0;
     string header = "";
 
     while (input.good()){
@@ -598,16 +596,16 @@ int64_t convertSAMtoFASTA(string sUnalignedFile){
     return 0;
 }
 
-int64_t filterOut (string sOutputFile, string sInputFile, string sFlag1, string sFlag2){
+int filterOut (string sOutputFile, string sInputFile, string sFlag1, string sFlag2){
     string command;
-    cout << "\nfiltering " + sFlag1 + " out of " + sProjectDirectory + sInputFile + " int64_to " + sProjectDirectory + sOutputFile + ".temp..." << endl;
-    fLogFileOut << "\nfiltering " + sFlag1 + " out of " + sProjectDirectory + sInputFile + " int64_to " + sProjectDirectory + sOutputFile + ".temp..." << endl;
+    cout << "\nfiltering " + sFlag1 + " out of " + sProjectDirectory + sInputFile + " into " + sProjectDirectory + sOutputFile + ".temp..." << endl;
+    fLogFileOut << "\nfiltering " + sFlag1 + " out of " + sProjectDirectory + sInputFile + " into " + sProjectDirectory + sOutputFile + ".temp..." << endl;
     command = "samtools view -h " + sFlag1 + " -S " + sProjectDirectory + sInputFile + ".sam > " + sProjectDirectory + sOutputFile + ".temp";
     system(command.c_str());
 
     if (sFlag2.compare("") != 0){
-        cout << "filtering " + sFlag2 + " out of " + sProjectDirectory + sInputFile + " int64_to " + sProjectDirectory + sOutputFile + ".sam..." << endl;
-        fLogFileOut << "filtering " + sFlag2 + " out of " + sProjectDirectory + sInputFile + " int64_to " +sProjectDirectory +  sOutputFile + ".sam..." << endl;
+        cout << "filtering " + sFlag2 + " out of " + sProjectDirectory + sInputFile + " into " + sProjectDirectory + sOutputFile + ".sam..." << endl;
+        fLogFileOut << "filtering " + sFlag2 + " out of " + sProjectDirectory + sInputFile + " into " +sProjectDirectory +  sOutputFile + ".sam..." << endl;
         command = "samtools view -h " + sFlag2 + " -S " + sProjectDirectory + sOutputFile + ".temp > " + sProjectDirectory + sOutputFile + ".sam";
         system(command.c_str());
 

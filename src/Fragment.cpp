@@ -20,7 +20,7 @@ Fragment::Fragment() {
     bAnchorLeft = true;
 }
 
-Fragment::Fragment(string anchor, int64_t anStart, int64_t flag, bool left, string unanchor, int64_t unStart){
+Fragment::Fragment(string anchor, int anStart, int flag, bool left, string unanchor, int unStart){
     sAnchoredRead = anchor;
     iAnchoredStart = anStart;
     iFlag = flag;
@@ -31,7 +31,7 @@ Fragment::Fragment(string anchor, int64_t anStart, int64_t flag, bool left, stri
     bAnchorLeft = left;
 }
 
-Fragment::Fragment(string anchor, int64_t anStart, int64_t flag, bool left, string unanchor, int64_t unStart, string parent, int64_t pStart){
+Fragment::Fragment(string anchor, int anStart, int flag, bool left, string unanchor, int unStart, string parent, int pStart){
     sAnchoredRead = anchor;
     iAnchoredStart = anStart;
     iFlag = flag;

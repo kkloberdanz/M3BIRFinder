@@ -21,9 +21,9 @@
 using namespace std;
 
 struct t_read{
-	int64_t iLength;
-	int64_t iStart;
-	int64_t iChromosome;
+	int iLength;
+	int iStart;
+	int iChromosome;
 	string sSequence;
 };
 
@@ -58,7 +58,7 @@ void sort_consolidated_file() {
 }
 
 // birFinder
-int64_t startCandidateReads(){
+int startCandidateReads(){
 	string sFinalAlignedFile = confDB.getKey("finalAlignedFile").stringVal;
 
 	if (confDB.getKey("performClustering").boolVal == false)
@@ -75,12 +75,12 @@ int64_t startCandidateReads(){
 
 	//createParentReads();
 
-	fLogFileOut << "\nRead database time = " << (int64_t)time(NULL)-time0 << endl;
+	fLogFileOut << "\nRead database time = " << (int)time(NULL)-time0 << endl;
 
 	return 0;
 }
 
-int64_t createSplitReadDatabase(string sAlignedFilename){
+int createSplitReadDatabase(string sAlignedFilename){
 	cout << "\nCreating candidate read database starting..." << endl;
 	fLogFileOut << "\nCreating candidate read database starting..." << endl;
 	ifstream input;
@@ -90,11 +90,11 @@ int64_t createSplitReadDatabase(string sAlignedFilename){
 	char field_delim = '\t';
 	string sReadName;
 	t_consolidated frag;
-	int64_t iChr = 0;
-	int64_t chromosome = confDB.getKey("chromosome").intVal;
-	int64_t iExludedReads = 0;
-	int64_t iBadReads = 0;
-	int64_t index = 0;
+	int iChr = 0;
+	int chromosome = confDB.getKey("chromosome").intVal;
+	int iExludedReads = 0;
+	int iBadReads = 0;
+	int index = 0;
 
 
     t_consolidated f;
@@ -125,12 +125,6 @@ int64_t createSplitReadDatabase(string sAlignedFilename){
             ++index;
             if (index % 10000000 == 0) {
                 cout << "half-read: " << index << endl;
-                /*
-                std::cout << "Size of curr: " << curr.size() << std::endl;
-                std::cout << "Size of vCandidateReads: " << vCandidateReads.size() << std::endl;
-                std::cout << "capacity: " << vCandidateReads.capacity() << std::endl;
-                std::cout << "max_size: " << vCandidateReads.max_size() << std::endl;
-                */
             }
             // reset vector
             curr.clear();
@@ -162,7 +156,7 @@ int64_t createSplitReadDatabase(string sAlignedFilename){
                     continue;
                 }
 
-                for (uint64_t i = 0; i < vReferenceGenome.size(); ++i){
+                for (uint i = 0; i < vReferenceGenome.size(); ++i){
                     //cout << curr[2] << " ?= " << vReferenceGenome[i].fastaHeader << endl;
                     if (curr.at(2).find(vReferenceGenome.at(i).fastaHeader) != string::npos)
                         frag.iChromosome = i;
@@ -183,76 +177,37 @@ int64_t createSplitReadDatabase(string sAlignedFilename){
                 }
 
 
-                /*
-                 * If read is good, store in write buffer.
-                 * Write buffer to a file after some time
-                 */
                 //vCandidateReads.push_back(frag);
                 num_candidate_reads++;
                 if (not frag.bBadRead) {
-                    //good_write_buffer.at(good_index) = frag;
-                    //good_index++;
-                    //good_write_buffer.push_back(frag);
-                        unconsolidated_output << frag.iChromosome << ", " << frag.iParentStart << ", " << frag.iParentEnd << std::endl;
+                    unconsolidated_output << frag.iChromosome << ", " << frag.iParentStart << ", " << frag.iParentEnd << std::endl;
                 }
 
-                /*
-                //if (good_index >= WRITE_BUFF_SIZE) {
-                if (good_write_buffer.size() >= WRITE_BUFF_SIZE) {
-                    //for (size_t i = 0; i < good_index; ++i) { 
-                    for (const auto& f : good_write_buffer) { 
-                        //f = good_write_buffer.at(i);
-                        unconsolidated_output << f.iChromosome << ", " 
-                               << f.iParentStart << ", " 
-                               << f.iParentEnd  << ", "
-                               << std::endl;
-                    } 
-                    //good_index = 0;
-                    good_write_buffer.clear();
-                }
-                */
+                candidate_reads_output 
+                       << frag.iChromosome << ", "  // 0
+                       << frag.iParentStart << ", " // 1
+                       << frag.iParentEnd  << ", "  // 2
 
+                       << frag.sReadName << ", "    // 3
+                       << frag.sParentRead << ", "  // 4
+                       << frag.iBirStart << ", "    // 5
 
-                //total_write_buffer.push_back(frag);
-                //total_write_buffer.at(total_index) = frag; 
-                //total_index++;
-                //if (total_index >= WRITE_BUFF_SIZE) {
-                //if (total_write_buffer.size() >= WRITE_BUFF_SIZE) {
-                    //for (size_t i = 0; i < total_index; ++i) {
-                    //for (const auto& f : total_write_buffer) {
-                        //f = total_write_buffer.at(i);
+                       << frag.iBirEnd << ", "      // 6
+                       << frag.sBir << ", "         // 7
+                       << frag.iBirLength << ", "   // 8 
 
-                        /* Sort based on these */
-                        candidate_reads_output 
-                               << frag.iChromosome << ", "  // 0
-                               << frag.iParentStart << ", " // 1
-                               << frag.iParentEnd  << ", "  // 2
+                       << frag.iTemplateStart << ", " // 9
+                       << frag.iTemplateEnd << ", "   // 10
+                       << frag.sTemplate << ", "      // 11
 
-                        /* Store these */
-                               << frag.sReadName << ", "    // 3
-                               << frag.sParentRead << ", "  // 4
-                               << frag.iBirStart << ", "    // 5
+                       << frag.iTemplateLength << ", "    // 12
+                       << frag.bBirCandidateFound << ", " // 13
+                       << frag.bAnchorLeft << ", "        // 14
 
-                               << frag.iBirEnd << ", "      // 6
-                               << frag.sBir << ", "         // 7
-                               << frag.iBirLength << ", "   // 8 
+                       << frag.iFlag << ", "              // 15
+                       << frag.bBadRead                   // 16
 
-                               << frag.iTemplateStart << ", " // 9
-                               << frag.iTemplateEnd << ", "   // 10
-                               << frag.sTemplate << ", "      // 11
-
-                               << frag.iTemplateLength << ", "    // 12
-                               << frag.bBirCandidateFound << ", " // 13
-                               << frag.bAnchorLeft << ", "        // 14
-
-                               << frag.iFlag << ", "              // 15
-                               << frag.bBadRead                   // 16
-
-                               << endl;
-                    //}
-                    //total_index = 0;
-                    //total_write_buffer.clear();
-                //}
+                       << endl;
 
                 }
         } catch (const std::bad_alloc& e) {
@@ -268,52 +223,6 @@ int64_t createSplitReadDatabase(string sAlignedFilename){
 
 	}
 
-
-    /*
-    //for (size_t i = 0; i < good_index; ++i) {
-    for (const auto& f : good_write_buffer) {
-        //f = good_write_buffer.at(i);
-        unconsolidated_output << f.iChromosome << ", " 
-               << f.iParentStart << ", " 
-               << f.iParentEnd  << ", "
-               << std::endl;
-    } 
-    good_write_buffer.clear();
-
-    //for (size_t i = 0; i < total_index; ++i) {
-    for (const auto & f : total_write_buffer) {
-        //f = total_write_buffer.at(i);
-
-        // Sort based on these
-        candidate_reads_output << f.iChromosome << ", " 
-               << f.iParentStart << ", " 
-               << f.iParentEnd  << ", " 
-
-        // Store these
-               << f.sReadName << ", " 
-               << f.sParentRead << ", " 
-               << f.iBirStart << ", " 
-
-               << f.iBirEnd << ", " 
-               << f.sBir << ", " 
-               << f.iBirLength << ", " 
-
-               << f.iTemplateStart << ", " 
-               << f.iTemplateEnd << ", " 
-               << f.sTemplate << ", " 
-
-               << f.iTemplateLength << ", " 
-               << f.bBirCandidateFound << ", " 
-               << f.bAnchorLeft << ", " 
-
-               << f.iFlag << ", " 
-               << f.bBadRead
-
-               << endl;
-    }
-    total_write_buffer.clear();
-    */
-
     sort_consolidated_file();
 
     output.close(); 
@@ -327,5 +236,5 @@ int64_t createSplitReadDatabase(string sAlignedFilename){
 
 	return 0;
 }
-// samtools view -S unaligned_1.sam | awk '{OFS="\t"; print64_t ">"$1"-1\n"substr($10,1,length($10)/2)"\n>"$1"-2\n"substr($10,length($10)/2+1,length($10))}' - > filename.fasta
+// samtools view -S unaligned_1.sam | awk '{OFS="\t"; print ">"$1"-1\n"substr($10,1,length($10)/2)"\n>"$1"-2\n"substr($10,length($10)/2+1,length($10))}' - > filename.fasta
 

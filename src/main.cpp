@@ -22,13 +22,13 @@
 #include "programExecution.h"
 #include "BWA.hpp" 
 
-uint64_t NUM_THREADS = 1;
+uint NUM_THREADS = 1;
 std::string  PROGRAM_NAME;
 
 using namespace std;
 
 /*
-void test_threads(int64_t i) {
+void test_threads(int i) {
     startExecutables(i);
 }
 */
@@ -37,7 +37,7 @@ double get_end_time_ms(clock_t start_time) {
     return 1000*(double)(clock() - start_time)/CLOCKS_PER_SEC;
 }
 
-int main(int64_t argc, char *argv[]) {
+int main(int argc, char *argv[]) {
     PROGRAM_NAME = argv[0];
     clock_t start_time = clock();
     // start timing
@@ -45,7 +45,7 @@ int main(int64_t argc, char *argv[]) {
 
     // get command line arguments
     start_time = clock();
-    int64_t cl = processCommandLine(argc, argv);
+    int cl = processCommandLine(argc, argv);
     if (cl != 0)
         cout << "Command line exited with: " << cl << endl;
 
@@ -61,13 +61,13 @@ int main(int64_t argc, char *argv[]) {
     sProjectDirectory = confDB.getKey("projectDirectory").stringVal;
     cout << "COMPLETED: prepareLogFile(): " << get_end_time_ms(start_time) << "ms" << endl;
 
-    // Print64_t the method configuration parameters
+    // Print the method configuration parameters
     printConfig(fLogFileOut);
 
     start_time = clock();
     // execute the main alignment programs (BWA and samtools)
     
-    //startExecutables(1); 
+    startExecutables(1); 
 
     start_time = clock();
     // read in reference genome
@@ -76,28 +76,28 @@ int main(int64_t argc, char *argv[]) {
 
     start_time = clock();
     // find reads with one half anchored and the other unaligned
-    int64_t cand = startCandidateReads();
+    int cand = startCandidateReads();
     if (cand != 0)
         cout << "startCandidateReads exited with: " << cand << endl;
     cout << "COMPLETED: startCandidateReads(): " << get_end_time_ms(start_time) << "ms" << endl;
 
     start_time = clock();
     // consolidate reads to narrow down BIR locations
-    int64_t cons = startConsolidate();
+    int cons = startConsolidate();
     if (cons != 0)
         cout << "startConsolidate exited with: " << cons << endl;
     cout << "COMPLETED: startConsolidate(): " << get_end_time_ms(start_time) << "ms" << endl;
 
     start_time = clock();
     // perform alignments to get candidate BIR locations
-    int64_t bir = startBirFinder();
+    int bir = startBirFinder();
     if (bir != 0)
         cout << "startBirFinder exited with: " << bir << endl;
     cout << "COMPLETED: startBirFinder(): " << get_end_time_ms(start_time) << "ms" << endl;
 
     start_time = clock();
     // we have the possible bir strings and their respective locations so let's find the template to confirm
-    int64_t temp = startTemplateFinder();
+    int temp = startTemplateFinder();
     if (temp != 0)
         cout << "startTemplateFinder exited with: " << temp << endl;
     cout << "COMPLETED: startTemplateFinder(): " << get_end_time_ms(start_time) << "ms" << endl;
@@ -106,7 +106,7 @@ int main(int64_t argc, char *argv[]) {
 }
 
 
-int64_t processCommandLine(int argc, char* argv[])
+int processCommandLine(int argc, char* argv[])
 {
     char *pch;
     string sName, sVal;
@@ -121,7 +121,7 @@ int64_t processCommandLine(int argc, char* argv[])
 
     // Now, any additional command line options are designed to override options
     // are in the configuration file
-    for(int64_t i = 2; i < argc; i++)
+    for(int i = 2; i < argc; i++)
     {
         pch = argv[i];
         if (*pch++ != '-')
@@ -191,8 +191,8 @@ void readInReferenceGenome(){
     ifstream input;
     t_chromosome chromosome;
     bool first = true;
-    int64_t iChr = confDB.getKey("chromosome").intVal;
-    int64_t currChr = 1;
+    int iChr = confDB.getKey("chromosome").intVal;
+    int currChr = 1;
 
     input.open(confDB.getKey("referenceFile").stringVal.c_str());
 
@@ -224,12 +224,12 @@ void readInReferenceGenome(){
 
     /*ofstream output;
     output.open("chromosome.fasta");
-    for (int64_t i = 0; i < vReferenceGenome.size(); ++i){
+    for (int i = 0; i < vReferenceGenome.size(); ++i){
         if (vReferenceGenome[i].sequence.length() < 2)
             continue;
         output << ">" << vReferenceGenome[i].fastaHeader << endl;
-        int64_t lngth = vReferenceGenome[i].sequence.length();
-        for (int64_t j = 0; j < lngth; ++j){
+        int lngth = vReferenceGenome[i].sequence.length();
+        for (int j = 0; j < lngth; ++j){
             output << vReferenceGenome[i].sequence.substr(j, 80) << endl;
             j += 79;
         }
@@ -237,7 +237,7 @@ void readInReferenceGenome(){
 
     output.close();
     exit(1);*/
-    // print64_t reference genome information
+    // print reference genome information
     printReferenceGenomeInfo(fLogFileOut);
 }
 

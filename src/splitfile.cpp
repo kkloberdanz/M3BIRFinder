@@ -23,10 +23,10 @@ void split_fastq(std::string input_filename,
 
     std::ifstream in_file;
     in_file.open(input_filename);
-    uint64_t num_lines = 0;
+    uint num_lines = 0;
     while (getline(in_file, line)) {
         if (num_lines >= SIZE_MAX) {
-            std::cerr << "error: filelength exeeds max length of uint64_t" 
+            std::cerr << "error: filelength exeeds max length of uint" 
                  << std::endl;
             std::exit(EXIT_FAILURE);
         }
@@ -37,15 +37,15 @@ void split_fastq(std::string input_filename,
     std::cout << input_filename << " is " << num_lines 
               << " lines long" << std::endl;
 
-    uint64_t num_files = output_filename_v.size();
+    uint num_files = output_filename_v.size();
     if (num_files < 1) {
         std::cerr << "error: attempting to write to less than 1 ouput file"
             << std::endl;
         std::exit(EXIT_FAILURE);
     }
-    uint64_t num_lines_per_file = num_lines / num_files;
-    uint64_t file_index = 0;
-    uint64_t num_lines_curr_file = 0;
+    uint num_lines_per_file = num_lines / num_files;
+    uint file_index = 0;
+    uint num_lines_curr_file = 0;
 
     std::cout << "Writing apprx " << num_lines_per_file 
               << " lines to each file" << std::endl;
@@ -75,8 +75,8 @@ void split_fastq(std::string input_filename,
     out_file.close();
 }
 
-int64_t main(int64_t argc, char** argv) {
-    uint64_t num_output_files = 0;
+int main(int argc, char** argv) {
+    uint num_output_files = 0;
     std::string input_filename = "";
 
     // Process input arguments

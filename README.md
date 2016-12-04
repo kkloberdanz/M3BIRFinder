@@ -1,16 +1,15 @@
 M3BIRFinder
 ==========
-A multithreaded fork of MMBIRFinder. The third "M" is for "Multithreaded"
-
-##Work in progress (not yet stable)
+A multithreaded fork of MMBIRFinder. 
+Multithreaded Microhomology Mediated Break Induced Replication Finder
 
 ##Installation
 --------------------------------------------------------------------------
 ```bash
 $ git clone https://github.com/kkloberdanz/M3BIRFinder
 $ cd M3BIRFinder/src
-$ python configure.py
-$ make
+$ ./configure.py
+$ make clean && make
 ```
 
 The binary can be found in ```Bin```
@@ -24,12 +23,17 @@ Start Bash
 $bash
 ```
 
+Split the fastq file across the number of threads you want to run
+```bash 
+$./splitfile.py -i INPUT_FASTQ_FILE -n NUMBER_OF_THREADS
+```
+
 Run M3BIRFinder with config-1.txt and designate log file location (Alignments take some time to run, maybe a long time with big reads files)
 
 Ensure that bwa is in the same directory as M3BIRFinder.
 
 ```bash
-$nohup ./M3BIRFinder config-1.txt > ./Log/run0222.log 2>&1
+$nohup ./M3BIRFinder config-1.txt -n NUMBER_OF_TREADS &> ./Log/log.txt
 ```
 
 Create columns.txt to be loaded into database
@@ -84,44 +88,29 @@ Notes: These instructions are for use of the M3BIRFinder on user bosia. Some cha
 
 --------------------------------------------------------------------------
 
-(Old Instructions from forked project) MMBIRFinder
-=========
-
-MMBIRFinder is a bioinformatics tool to detect microhomology-mediated break-induced replication(MMBIR) events. 
-
-Specifically, MMBIRFinder detects template-switching events associated with MMBIR.
-
-The tool writes to a Log file for easy recording of important parameters, run time settings, and results.
-
-Installation
---------------
-
-The included executable should work in most Linux environments and is located in the Debug folder.
-
-Otherwise, the source code can be compiled using the included Make file.
-```bash
-make -f makefile
-```
-
 Dependencies
 --------------
 
-MMBIRFinder requires BWA version 0.7.0 or greater. 
+M3BIRFinder requires BWA version 0.7.0 or greater. (Put BWA in the same directory as m3birfinder)
 
 However, please consult the BWA website for specific information 
 pertaining to your data. For example, if your data contains paired-end reads longer than 100 b.p. then a newer
 version of BWA may be required. 
+
+python3
 
 Usage
 --------------
 Run the program by invoking the executable followed by the configuration file.
 
 ```bash
-./mmbirFinder configFile [options]
-    -?                  Command line options
-    configFile          Program configuration file name
-    -j jobIdString      Identifier to be used for this job
-    -OconfOption=Value  Override options in the configuration file
+Usage: Bin/m3birfinder configFile [options]
+ -?                    Command line options
+ configFile            Program configuration file name
+ -j jobIdString        Identifier to be used for this job
+ -n number of threads  Default = 1, (Cores available: 32)
+ -OconfOption=Value    Override options in the configuration file here
+
 ```
 
 A test data set is included to learn the functionality of MMBIRFinder. The simulation FASTQ file contains 5000 inserted

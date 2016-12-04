@@ -28,29 +28,29 @@ struct t_chromosome {
 struct t_consolidated{
     string sReadName;
     string sParentRead;
-    int64_t iParentStart;
-    int64_t iParentEnd;
-    int64_t iBirStart;
-    int64_t iBirEnd;
+    int iParentStart;
+    int iParentEnd;
+    int iBirStart;
+    int iBirEnd;
     string sBir;
-    int64_t iBirLength;
-    int64_t iTemplateStart;
-    int64_t iTemplateEnd;
+    int iBirLength;
+    int iTemplateStart;
+    int iTemplateEnd;
     string sTemplate;
-    int64_t iTemplateLength;
+    int iTemplateLength;
     bool bBirCandidateFound;
-    int64_t iChromosome;
+    int iChromosome;
     bool bAnchorLeft;
-    int64_t iFlag;
+    int iFlag;
     bool bBadRead;
 };
 
 
 struct t_alignment_struct{
-    int64_t iEndPosI;
-    int64_t iStartPosI;
-    int64_t iEndPosJ;
-    int64_t iStartPosJ;
+    int iEndPosI;
+    int iStartPosI;
+    int iEndPosJ;
+    int iStartPosJ;
     string sAlignedRegionI;
     string sAlignedRegionJ;
 };
@@ -63,7 +63,7 @@ vector<vector <t_consolidated> > vConsolidated; // vector of CONSOLIDATED BIR lo
 vector<t_consolidated> vCandidateRegions;
 vector<t_consolidated> vFinalBirLocs;
 vector<t_chromosome> vReferenceGenome; // the reference genome
-int64_t time0;
+int time0;
 string sJobId;
 string sBaseFileName;
 string sProjectDirectory;
@@ -77,7 +77,7 @@ extern vector<vector <t_consolidated> > vConsolidated; // vector of CONSOLIDATED
 extern vector<t_consolidated> vCandidateRegions;
 extern vector<t_consolidated> vFinalBirLocs;
 extern vector<t_chromosome> vReferenceGenome; // the reference genome
-extern int64_t time0;
+extern int time0;
 extern string sJobId;
 extern string sBaseFileName;
 extern string sProjectDirectory;
@@ -89,53 +89,53 @@ extern size_t num_candidate_reads;
 
 // main
 void readInReferenceGenome();
-int64_t startExecutables();
-int64_t processCommandLine(int argc, char* argv[]);
+int startExecutables();
+int processCommandLine(int argc, char* argv[]);
 void printUsageAndExit(char *sName);
 string setupBaseFileName();
 void prepareLogFile(ofstream& fout, string sBaseFileName, string sLogDirName);
 
 // programExecution
-int64_t startExecutables();
-int64_t executeBwaIndex(string s);
-int64_t executeBwaAligner(string s1, string s2, string s3);
-int64_t getReads(string s1, string s2, string s3, string s4, bool b1);
-int64_t filterOut(string s1, string s2, string s3, string s4);
-int64_t convertSAMtoFASTA(string s);
+int startExecutables();
+int executeBwaIndex(string s);
+int executeBwaAligner(string s1, string s2, string s3);
+int getReads(string s1, string s2, string s3, string s4, bool b1);
+int filterOut(string s1, string s2, string s3, string s4);
+int convertSAMtoFASTA(string s);
 
 // birFinder
-int64_t startCandidateReads();
-int64_t createSplitReadDatabase(string s1);
+int startCandidateReads();
+int createSplitReadDatabase(string s1);
 
 // birAligner
-int64_t startBirFinder();
-int64_t getLastPosition(string &sReference, string &sAligned);
-void getBirLoc(t_alignment_struct tAligned, int64_t st, int64_t i);
+int startBirFinder();
+int getLastPosition(string &sReference, string &sAligned);
+void getBirLoc(t_alignment_struct tAligned, int st, int i);
 
 // birConsolidate
-int64_t startConsolidate();
+int startConsolidate();
 void consolidateLocations();
-int64_t createParentReadsFromMySQL();
-int64_t createParentReads();
+int createParentReadsFromMySQL();
+int createParentReads();
 void getConsensus();
 void consolidateBaseCalls();
 bool compareStart(const t_consolidated &a, const t_consolidated &b);
 
 // templateFinder
-int64_t startTemplateFinder();
+int startTemplateFinder();
 string getReverseComplement(string &str);
 
 // alignment
 t_alignment_struct getLocalAlignment(string seq1, string seq2, double d1, double d2);
 t_alignment_struct getGlobalAlignment(string &seq1, string &seq2, double d1, double d2);
 double getSimilarityScore(char a, char b);
-int64_t getMaxArrayValue(double array[], int64_t length);
+int getMaxArrayValue(double array[], int length);
 
 // printOptions
 void printConfig(ostream& out);
 void printMatches(ostream& out, t_alignment_struct &a);
 void printError(ostream& out, string &bir, string &ref, t_alignment_struct tAligned);
-void printAlignment(ostream& out, string &bir, string &ref, int64_t readStart, t_alignment_struct tAligned);
+void printAlignment(ostream& out, string &bir, string &ref, int readStart, t_alignment_struct tAligned);
 void printFinal();
 void printReferenceGenomeInfo(ostream& out);
 void printCandidateReadsInfo(ostream& out);

@@ -67,7 +67,7 @@ void print_t_consolidated(t_consolidated f) {
 }
 
 // birConsolidate
-int64_t startConsolidate(){
+int startConsolidate(){
     cout << "\nstartConsolidate start..." << endl;
     fLogFileOut << "\nstartConsolidate start..." << endl;
     ofstream output;
@@ -85,7 +85,7 @@ int64_t startConsolidate(){
 
         /*
         output.open((sProjectDirectory + "unconsolidated_bir_locations.txt").c_str());
-        for (uint64_t i = 0; i < vCandidateReads.size(); ++i){
+        for (uint i = 0; i < vCandidateReads.size(); ++i){
             if (vCandidateReads[i].bBadRead)
                 continue;
             output << vCandidateReads[i].iChromosome << ", " << vCandidateReads[i].iParentStart << "," << vCandidateReads[i].iParentEnd << endl;
@@ -129,16 +129,16 @@ int64_t startConsolidate(){
     // Make all the reads in a cluster the same length
     getConsensus();
 
-    // Create a consensus read that takes int64_to consideration all the base calls at a specific location
+    // Create a consensus read that takes into consideration all the base calls at a specific location
     consolidateBaseCalls();
 
     // Let's destruct all the elements in the database to save space
     vConsolidated.clear();
 
-    fLogFileOut << "\nConsolidation time = " << (int64_t)time(NULL)-time0 << endl;
+    fLogFileOut << "\nConsolidation time = " << (int)time(NULL)-time0 << endl;
 
     output.open((sProjectDirectory+ "consolidated_bir_locations.txt").c_str());
-    for (uint64_t i = 0; i < vCandidateRegions.size(); ++i)
+    for (uint i = 0; i < vCandidateRegions.size(); ++i)
         output << vCandidateRegions[i].iChromosome << ", " << vCandidateRegions[i].iParentStart << "," << vCandidateRegions[i].iParentStart + vCandidateRegions[i].sParentRead.length() << endl;
     output.close();
 
@@ -160,18 +160,18 @@ void consolidateLocations(){
     fLogFileOut << "\nConsolidating read locations start..." << endl;
 
     // TODO Find better way to consolidate, maybe based on stdev and discard ones that aren't (ie through out outliers)
-    int64_t iLastEndLoc = 0;
-    uint64_t iMinConsolidate = confDB.getKey("minConsolidate").intVal; // the minimum number of reads to consolidate, otherwise don't add to vector
+    int iLastEndLoc = 0;
+    uint iMinConsolidate = confDB.getKey("minConsolidate").intVal; // the minimum number of reads to consolidate, otherwise don't add to vector
     vector<t_consolidated> curr;
-    int64_t iNumReads = 0;
-    int64_t iSkippedCluster = 0;
+    int iNumReads = 0;
+    int iSkippedCluster = 0;
     bool first = true;
-    int64_t iChr = (confDB.getKey("chromosome").intVal == 0 ? 0 : confDB.getKey("chromosome").intVal - 1); // get the user specified chromoome
+    int iChr = (confDB.getKey("chromosome").intVal == 0 ? 0 : confDB.getKey("chromosome").intVal - 1); // get the user specified chromoome
     bool bOnlyOneChr = (confDB.getKey("chromosome").intVal != 0 ? true :false);
-    //int64_t sizeCan = vCandidateReads.size();
-    int64_t sizeCan = num_candidate_reads;
+    //int sizeCan = vCandidateReads.size();
+    int sizeCan = num_candidate_reads;
     std::cout << "sizeCan: " << sizeCan << std::endl;
-    int64_t fivePercent = sizeCan / 20;
+    int fivePercent = sizeCan / 20;
     string sHalfReadClusters = confDB.getKey("clusterFile").stringVal;
 
     cout << "Chromsome: " << iChr << endl;
@@ -188,15 +188,9 @@ void consolidateLocations(){
     try {
         for (size_t i = 0; candidate_reads_file >> row; ++i) {
 
-            //row.print();
-
-            //std::cout << "Itteration: " << i << std::endl;
-
             for (size_t j = 0; j < row.size(); ++j) {
                 row_v.push_back(remove_char(row[j], ' '));
             }
-
-            //print_vector(row_v);
 
             if (first && (i > 0)) {
                 frag = prev;
@@ -220,8 +214,6 @@ void consolidateLocations(){
                 frag.bBadRead             = atoi(row_v[16].c_str()) != 0; 
             }
             row_v.clear();
-
-            //print_t_consolidated(frag);
 
             if (i % fivePercent == 0)
                 cout << "\tcandidateRead: " << i << " of " << sizeCan << " on chromosome " << iChr << " (" << ((i * 100) / sizeCan) << "%)" << endl;
@@ -280,16 +272,16 @@ void consolidateLocations(){
     cout << "Number of clusters: " << vConsolidated.size() << endl;
     fLogFileOut << "Number of clusters: " << vConsolidated.size() << endl;
 
-    // Now the program will print64_t out the consolidate read locations
+    // Now the program will print out the consolidate read locations
     // A MySQL and Perl script is required to parse the data to further the program
     // The program will now exit
     fLogFileOut << "\nPrinting half_read_clusters.txt" << endl;
     ofstream output;
     output.open((sProjectDirectory + sHalfReadClusters.c_str()).c_str());
-    int64_t size2 = 0;
-    for (int64_t i = 0; i < vConsolidated.size(); ++i){
+    int size2 = 0;
+    for (int i = 0; i < vConsolidated.size(); ++i){
         size2 = vConsolidated[i].size();
-        for (int64_t j = 0; j < size2; ++j){
+        for (int j = 0; j < size2; ++j){
             output << vConsolidated[i].at(j).sReadName << "\t" << vConsolidated[i].at(j).sParentRead << "\t" << vConsolidated[i].at(j).iParentStart << "\t" << vConsolidated[i].at(j).iChromosome << "\t"<< i << endl;
         }
     }
@@ -303,15 +295,15 @@ void consolidateLocations(){
     }
         */
 
-    // print64_t out the half-read clustered locations
+    // print out the half-read clustered locations
     /*fLogFileOut << "Printing half_read_clustered_locations.txt" << endl;
     output.open("half_read_clustered_locations.txt");
     output << "i\tchr\tsize\tmin\tmax\tlength" << endl;
-    for (int64_t i = 0; i < iNumReads; ++i){
-        int64_t min = 0;
-        int64_t max = 0;
+    for (int i = 0; i < iNumReads; ++i){
+        int min = 0;
+        int max = 0;
         size2 = vConsolidated[i].size();
-        for (int64_t j = 0; j < size2; ++j){
+        for (int j = 0; j < size2; ++j){
             if (j == 0)
                 min = vConsolidated[i].at(j).iParentStart;
             else if (vConsolidated[i].at(j).iParentStart < min)
@@ -323,7 +315,7 @@ void consolidateLocations(){
     }
     output.close();*/
 
-    fLogFileOut << "\nCluster time = " << (int64_t)time(NULL)-time0 << endl;
+    fLogFileOut << "\nCluster time = " << (int)time(NULL)-time0 << endl;
 
     // clean up memory before exiting
     //cout << "\nCleaning vCandidateReads..." << endl;
@@ -334,7 +326,7 @@ void consolidateLocations(){
     //exit(0);
 }
 
-int64_t createParentReadsFromMySQL(){
+int createParentReadsFromMySQL(){
     cout << "\nImporting clusters start... " << endl;
     fLogFileOut << "\nImporting clusters start... " << endl;
 
@@ -349,14 +341,14 @@ int64_t createParentReadsFromMySQL(){
     t_consolidated cons;
     vector<string> curr;
     vector<t_consolidated> vCluster;
-    int64_t iCluster = 0;
-    int64_t iCurrCluster = 0;
-    int64_t iClustersImported = 0;
-    int64_t iReadsImported = 0;
-    int64_t iChromosome = confDB.getKey("chromosome").intVal;
+    int iCluster = 0;
+    int iCurrCluster = 0;
+    int iClustersImported = 0;
+    int iReadsImported = 0;
+    int iChromosome = confDB.getKey("chromosome").intVal;
     bool first = true;
-    //uint64_t iMinConsolidate = confDB.getKey("minConsolidate").intVal; // the minimum number of reads to consolidate, otherwise don't add to vector
-    int64_t iSkipped = 0;
+    //uint iMinConsolidate = confDB.getKey("minConsolidate").intVal; // the minimum number of reads to consolidate, otherwise don't add to vector
+    int iSkipped = 0;
 
     for (string row; getline(input, row, '\n');){
         istringstream ss(row);
@@ -413,17 +405,17 @@ int64_t createParentReadsFromMySQL(){
     fLogFileOut << "Clusters imported: " << iClustersImported << endl;
     cout << "Reads imported: " << iReadsImported << endl;
     fLogFileOut << "Reads imported: " << iReadsImported << endl;
-    fLogFileOut << "Cluster import time = " << (int64_t)time(NULL)-time0 << endl;
+    fLogFileOut << "Cluster import time = " << (int)time(NULL)-time0 << endl;
 
     ofstream output;
     output.open((sProjectDirectory+ "clustered_locations.txt").c_str());
 
     output << "i\tj\tstart\tchr\tread" << endl;
-    int64_t size = vConsolidated.size();
-    int64_t size2 = 0;
-    for (int64_t i = 0; i < size; ++i) {
+    int size = vConsolidated.size();
+    int size2 = 0;
+    for (int i = 0; i < size; ++i) {
         size2 = vConsolidated[i].size();
-        for (int64_t j = 0; j < size2; ++j)
+        for (int j = 0; j < size2; ++j)
             output << i << ", " << j << ", " << vConsolidated[i].at(j).iParentStart << ", " << vConsolidated[i].at(j).iChromosome << ", " << vConsolidated[i].at(j).sParentRead << endl;
     }
 
@@ -432,7 +424,7 @@ int64_t createParentReadsFromMySQL(){
     return 0;
 }
 
-int64_t createParentReads(){
+int createParentReads(){
     cout << "\nCreating parent reads start... " << endl;
     fLogFileOut << "\nCreating parent reads start... " << endl;
 
@@ -467,14 +459,14 @@ int64_t createParentReads(){
 
     //vector<t_consolidated>& temp;
 
-    int64_t iFound = 0;
-    int64_t iSize = vConsolidated.size();
-    int64_t iSize2 = 0;
+    int iFound = 0;
+    int iSize = vConsolidated.size();
+    int iSize2 = 0;
     char last;
-    for (int64_t i = 0; i < iSize; ++i){
+    for (int i = 0; i < iSize; ++i){
         vector<t_consolidated>& temp = vConsolidated[i];
         iSize2 = temp.size();
-        for (int64_t j = 0; j < iSize2; ++j){
+        for (int j = 0; j < iSize2; ++j){
             sReadName = temp[j].sReadName;
             //sReadName = vConsolidated[i].at(j).sReadName;
             last = sReadName[sReadName.size() - 1];
@@ -508,7 +500,7 @@ int64_t createParentReads(){
  * For example, if the reads are:
  *
  *   AACGTCGA                                      --AACGTCGA---
- * CGAACGTC            will be transformed int64_to    CGAACGTC-----
+ * CGAACGTC            will be transformed into    CGAACGTC-----
  *     CGTCGACGT                                ----CGTCGACGT
  *
  * This helps for the the next step which is calculate the base calls at each location.
@@ -517,33 +509,33 @@ void getConsensus(){
     cout << "\nMaking reads same length..." << endl;
     fLogFileOut << "\nMaking reads same length..." << endl;
 
-    int64_t iLowestStart;
-    int64_t iLongest;
-    int64_t iCurrStart;
-    int64_t diff;
-    int64_t size = 0;
+    int iLowestStart;
+    int iLongest;
+    int iCurrStart;
+    int diff;
+    int size = 0;
     string currString;
-    int64_t sizeCons = vConsolidated.size();
-    int64_t fivePercent = sizeCons / 20;
+    int sizeCons = vConsolidated.size();
+    int fivePercent = sizeCons / 20;
 
     // make all the reads in each consolidation have the same starting point
-    for (uint64_t i = 0; i < sizeCons; ++i){
+    for (uint i = 0; i < sizeCons; ++i){
         if (i % fivePercent == 0)
             cout << "consolidated: " << (i+1) << " of " << sizeCons << " (" << ((i * 100) / sizeCons) << "%)" << endl;
         size = vConsolidated[i].size();
         iLowestStart = vConsolidated[i].at(0).iParentStart;
-        for (int64_t j = 1; j < size; ++j){
+        for (int j = 1; j < size; ++j){
             iCurrStart = vConsolidated[i].at(j).iParentStart;
             if (iLowestStart > iCurrStart)
                 iLowestStart = iCurrStart;
         }
 
         // Now we have the lowest starting point, let's add '-' to the beginning so they all match up
-        for (int64_t j = 0; j < size; ++j){
+        for (int j = 0; j < size; ++j){
             iCurrStart =  vConsolidated[i].at(j).iParentStart;
             currString = vConsolidated[i].at(j).sParentRead;
             diff = iCurrStart - iLowestStart;
-            for (int64_t k = 0; k < diff; ++k){
+            for (int k = 0; k < diff; ++k){
                 currString = "-" + currString;
                 ++iCurrStart;
             }
@@ -553,16 +545,16 @@ void getConsensus(){
 
         // Let's repeat only adding '-' to the end
         iLongest = vConsolidated[i].at(0).sParentRead.length();
-        for (int64_t j = 1; j < size; ++j){
+        for (int j = 1; j < size; ++j){
             iCurrStart = vConsolidated[i].at(j).sParentRead.length();
             if (iLongest < iCurrStart)
                 iLongest = iCurrStart;
         }
 
-        for (int64_t j = 0; j < size; ++j){
+        for (int j = 0; j < size; ++j){
             iCurrStart = vConsolidated[i].at(j).sParentRead.length();
             currString = vConsolidated[i].at(j).sParentRead;
-            for (int64_t k = iCurrStart; k < iLongest; ++k){
+            for (int k = iCurrStart; k < iLongest; ++k){
                 currString = currString + "-";
                 ++iCurrStart;
             }
@@ -575,11 +567,11 @@ void getConsensus(){
     output.open((sProjectDirectory + "clustered_locations2.txt").c_str());
 
     output << "i\tj\tstart\tchr\tread" << endl;
-    int64_t size2 = vConsolidated.size();
-    int64_t size3 = 0;
-    for (int64_t i = 0; i < size2; ++i) {
+    int size2 = vConsolidated.size();
+    int size3 = 0;
+    for (int i = 0; i < size2; ++i) {
         size3 = vConsolidated[i].size();
-        for (int64_t j = 0; j < size3; ++j)
+        for (int j = 0; j < size3; ++j)
             output << i << ", " << j << ", " << vConsolidated[i].at(j).iParentStart << ", " << vConsolidated[i].at(j).iChromosome << ", " << vConsolidated[i].at(j).sParentRead << endl;
         output << endl;
     }
@@ -598,17 +590,17 @@ void consolidateBaseCalls(){
     cout << "\nCalculating consensus base calls..." << endl;
     fLogFileOut << "\nCalculating consensus base calls..." << endl;
 
-    int64_t iConsolidatedSize = vConsolidated.size();
-    int64_t iCurrSize = 0;
-    int64_t arr[85];
-    int64_t numTot = 0;
-    int64_t iReadLength = 0;
+    int iConsolidatedSize = vConsolidated.size();
+    int iCurrSize = 0;
+    int arr[85];
+    int numTot = 0;
+    int iReadLength = 0;
     string blank = "";
     string sConsensus = ""; // the consensus string
-    int64_t iMinStartPos = 0;
+    int iMinStartPos = 0;
     string sCurrChar;
-    int64_t iHighestProb;
-    int64_t fivePercent = iConsolidatedSize / 20;
+    int iHighestProb;
+    int fivePercent = iConsolidatedSize / 20;
     t_consolidated consensusRead;
 
     /*
@@ -622,7 +614,7 @@ void consolidateBaseCalls(){
      */
     // TODO erase starting from the back.
 
-    for (int64_t i = 0; i < iConsolidatedSize; ++i){
+    for (int i = 0; i < iConsolidatedSize; ++i){
         if (i % fivePercent == 0)
             cout << "consolidated: " << i << " of " << iConsolidatedSize << " (" << ((i * 100) / iConsolidatedSize) << "%)" << endl;
 
@@ -634,19 +626,19 @@ void consolidateBaseCalls(){
         iCurrSize = curr.size();
 
         iMinStartPos = curr[0].iParentStart;
-        for (int64_t j = 1; j < iCurrSize; ++j){
+        for (int j = 1; j < iCurrSize; ++j){
             if (curr[j].iParentStart < iMinStartPos)
                 iMinStartPos = curr[j].iParentStart;
         }
 
-        for (int64_t j = 0; j < iReadLength; ++j){
+        for (int j = 0; j < iReadLength; ++j){
             // initialize array and variables to 0s
-            for (int64_t k = 0; k < 85; ++k)
+            for (int k = 0; k < 85; ++k)
                 arr[k] = 0;
             numTot = 0;
 
-            for (int64_t k = 0; k < iCurrSize; ++k){
-                ++arr[(int64_t) curr[k].sParentRead.at(j)];
+            for (int k = 0; k < iCurrSize; ++k){
+                ++arr[(int) curr[k].sParentRead.at(j)];
                 if (curr[k].sParentRead.at(j) != '-')
                     ++numTot;
             }

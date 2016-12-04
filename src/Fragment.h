@@ -15,27 +15,27 @@ using namespace std;
 class Fragment {
 private:
     string sAnchoredRead;
-    int64_t iAnchoredStart;
-    int64_t iFlag;
+    int iAnchoredStart;
+    int iFlag;
     string sUnanchoredRead;
-    int64_t iUnanchoredStart;
+    int iUnanchoredStart;
     string sParentRead;
-    int64_t iParentStart;
+    int iParentStart;
     bool bAnchorLeft;
 public:
     Fragment();
-    Fragment(string anchor, int64_t anStart, int64_t flag, bool left, string unanchor, int64_t unStart);
-    Fragment(string anchor, int64_t anStart, int64_t flag, bool left, string unanchor, int64_t unStart, string parent, int64_t pStart);
+    Fragment(string anchor, int anStart, int flag, bool left, string unanchor, int unStart);
+    Fragment(string anchor, int anStart, int flag, bool left, string unanchor, int unStart, string parent, int pStart);
 
     virtual ~Fragment();
 
     // get functions
     bool isAnchorLeft()        { return bAnchorLeft; }
-    int64_t getAnchoredStart()     { return iAnchoredStart; }
-    int64_t getFlag()            { return iFlag; }
-    int64_t getUnanchoredStart() { return iUnanchoredStart; }
+    int getAnchoredStart()     { return iAnchoredStart; }
+    int getFlag()            { return iFlag; }
+    int getUnanchoredStart() { return iUnanchoredStart; }
     bool getAnchorLeft()        { return bAnchorLeft; }
-    int64_t getParentStart()     { return iParentStart; }
+    int getParentStart()     { return iParentStart; }
     string* getAnchoredRead() { return &sAnchoredRead; }
     string* getParentRead() { return &sParentRead; }
     string* getUnanchoredRead() { return &sUnanchoredRead; }
